@@ -197,7 +197,7 @@
 
     report.count = state.count;
     report.changes = state.changes;
-    report.records = state.records.slice(-5);
+    report.records = state.records.slice(-10);
     report.status = !report.saved ? "写入未确认" : (!changed ? "与上次相同" : "出口 IP 发生变化");
     return report;
   }
@@ -255,7 +255,7 @@
     html += '<div style="font-size:11px;color:#718096">' + escapeHtml(intel && intel.ok ? intel.data.asn + " · " + intel.data.org : "ASN / 运营商未知") + '</div></div>';
 
     html += '<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed;margin-top:5px"><tr>';
-    html += tile("双源出口校验", agree ? "一致" : "未通过", "ipify + icanhazip", agree ? colorGreen : colorAmber);
+    html += tile("双源出口校验", agree ? "双源一致" : "未通过", "ipify + icanhazip", agree ? colorGreen : colorAmber);
     html += tile("IP 归属信息", intel && intel.ok ? "已获取" : "不可用", intel && intel.ok ? intel.data.countryCode : "第三方查询失败", intel && intel.ok ? colorGreen : colorMuted);
     html += '</tr><tr>';
     html += tile("节点策略", "已指定", policy, colorBlue);
