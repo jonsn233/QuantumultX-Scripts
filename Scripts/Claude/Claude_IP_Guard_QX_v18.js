@@ -180,7 +180,7 @@
   }
 
   function parseProviderJSON(body) {
-    var data = JSON.parse(String(body || "").replace(/^\\uFEFF/, ""));
+    var data = JSON.parse(String(body || "").replace(/^\uFEFF/, ""));
     if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("JSON 结构无效");
     return data;
   }
@@ -193,7 +193,7 @@
 
   function parseAbuserScore(value) {
     var text = safeText(value);
-    var match = text.match(/([0-9]*\\.?[0-9]+)\\s*%?\\s*\\(([^)]+)\\)/);
+    var match = text.match(/([0-9]*\.?[0-9]+)\s*%?\s*\(([^)]+)\)/);
     if (!match) return { raw: text, score: null, level: "未提供可识别评分" };
     var n = Number(match[1]);
     if (!Number.isFinite(n)) return { raw: text, score: null, level: "评分格式无效" };
@@ -203,8 +203,8 @@
   function parseIp2LocationHTML(body, expectedIP) {
     var html = String(body || "");
     if (html.indexOf(expectedIP) < 0) throw new Error("页面未包含目标 IP，拒绝采信");
-    var usage = html.match(/Usage\\s*Type<\\/label>\\s*<p[^>]*>\\s*\\(?([A-Z]+(?:\\/[A-Z]+)*)/i);
-    var fraud = html.match(/Fraud\\s*Score<\\/label>\\s*<p[^>]*>\\s*(\\d+(?:\\.\\d+)?)/i);
+    var usage = html.match(/Usage\s*Type<\/label>\s*<p[^>]*>\s*\(?([A-Z]+(?:\/[A-Z]+)*)/i);
+    var fraud = html.match(/Fraud\s*Score<\/label>\s*<p[^>]*>\s*(\d+(?:\.\d+)?)/i);
     var score = fraud ? parseScore(fraud[1]) : null;
     if (!usage && score === null) throw new Error("未找到可验证的 IP2Location 字段");
     return { ip: expectedIP, usageType: usage ? usage[1].toUpperCase() : "未知", fraudScore: score };
@@ -214,7 +214,7 @@
     var html = String(body || "");
     if (html.indexOf(expectedIP) < 0) throw new Error("页面未包含目标 IP，拒绝采信");
     if (/Attention Required|cf-error-details|access denied/i.test(html)) throw new Error("目标网站拒绝访问");
-    var match = html.match(/Fraud\\s*Score\\b[\\s\\S]{0,300}?(\\d{1,3})/i);
+    var match = html.match(/Fraud\s*Score\b[\s\S]{0,300}?(\d{1,3})/i);
     if (!match) throw new Error("页面未提供可识别的 Fraud Score");
     var score = parseScore(match[1]);
     if (score === null) throw new Error("Scamalytics 评分超出有效范围");
