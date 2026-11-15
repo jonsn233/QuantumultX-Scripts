@@ -60,7 +60,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   // A missing node parameter must never start a network request.
   let x=await run({tag:"",answers:mocks()});
   assert.equal(x.requests.length,0);
-  assert.match(x.output.message,/未收到节点标签/);
+  assert.match(x.output.message,/请长按具体节点启动/);
 
   // Two matching echo providers save history under selected-node key.
   const prefs=new Map();
@@ -68,7 +68,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   assert.equal(x.requests.length,7);
   assert.ok(x.requests.every(r=>r.opts.policy==="US-LA"));
   assert.match(x.output.message,/38\.113\.126\.217/);
-  assert.match(x.output.message,/双来源一致/);
+  assert.match(x.output.message,/双源：一致/);
   assert.equal(JSON.parse(prefs.get("ClaudeIPGuard.v19.history.US-LA")).count,1);
 
   // Switching node must not inherit previous node's IP or history.
@@ -80,7 +80,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   // A mismatch is fail-closed: no geo request and no history write.
   x=await run({tag:"MISMATCH",answers:mocks("1.1.1.1","8.8.8.8"),prefs});
   assert.equal(x.requests.length,2);
-  assert.match(x.output.message,/双来源未确认/);
+  assert.match(x.output.message,/双源：未确认/);
   assert.equal(prefs.has("ClaudeIPGuard.v19.history.MISMATCH"),false);
 
   // Invalid IPv4 cannot enter the history.
@@ -90,7 +90,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
 
   // Geo response for another IP is rejected, but exit history remains valid.
   x=await run({tag:"GEO-MISMATCH",answers:mocks("1.1.1.1","1.1.1.1","8.8.8.8"),prefs});
-  assert.match(x.output.message,/归属查询结果未匹配目标 IP/);
+  assert.match(x.output.message,/归属：未知/);
   assert.equal(JSON.parse(prefs.get("ClaudeIPGuard.v19.history.GEO-MISMATCH")).count,1);
 
   // HTTP 429 must show an unavailable source, never zero risk.
@@ -114,7 +114,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   invalidBackup["ipwho.is"]={status:403,body:"forbidden"};
   invalidBackup["ipapi.co"]={body:JSON.stringify({ip:"8.8.8.8",country_name:"US"})};
   x=await run({tag:"GEO-BAD-BACKUP",answers:invalidBackup,prefs});
-  assert.match(x.output.message,/备用归属查询失败或 IP 不匹配/);
+  assert.match(x.output.message,/归属：未知/);
   assert.equal(JSON.parse(prefs.get("ClaudeIPGuard.v19.history.GEO-BAD-BACKUP")).count,1);
 
   // Per-provider success caches persist independently of a failing provider.
@@ -169,7 +169,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
 
   // Failed local persistence must not be reported as saved.
   x=await run({tag:"SAVE-FAIL",answers:mocks(),saveOk:false});
-  assert.match(x.output.message,/本地写入未确认/);
+  assert.match(x.output.message,/历史：保存失败/);
 
-  console.log("PASS: 16 mocked Quantumult X release candidate scenarios");
+  console.log("PASS: compact native QX regression scenarios");
 })().catch(e=>{console.error(e);process.exitCode=1;});
