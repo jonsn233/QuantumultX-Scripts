@@ -1,0 +1,28 @@
+name: Claude IP Guard v17 tests
+
+on:
+  push:
+    branches:
+      - feature/claude-ip-guard-v17-node-aware
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax check
+        run: node --check Scripts/Claude/Claude_IP_Guard_QX_v17.js
+      - name: Run mocked Quantumult X tests
+        run: node Tests/Claude_IP_Guard_QX_v17.test.cjs
