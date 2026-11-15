@@ -260,7 +260,7 @@
   }
   var tag = selectedTag();
   if (!tag) {
-    finish("未选择节点",'<p class="bad">请从 Quantumult X 长按具体节点启动。未收到节点标签，已停止，未发送检测请求。</p>');
+    finish("未选择节点","请长按具体节点启动。未发送请求。");
     return;
   }
   Promise.all([get(A,tag,parseEcho),get(B,tag,parseEcho)]).then(function (pair) {
