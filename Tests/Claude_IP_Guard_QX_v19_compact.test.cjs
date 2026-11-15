@@ -167,6 +167,19 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   assert.equal(x.output.htmlMessage,undefined);
   assert.doesNotMatch(x.output.message,/最近采样|检测说明|<html>/);
 
+  // Untrusted node labels and network errors must not create a huge native dialog.
+  const hugeTag="US-LA-"+("X".repeat(1200));
+  x=await run({tag:hugeTag,answers:mocks("1.1.1.1")});
+  assert.ok(x.output.message.length<400);
+  assert.match(x.output.message,/节点：US-LA-/);
+
+  const failedEcho=mocks("1.1.1.1");
+  failedEcho["api.ipify.org"]={reject:"network "+("E".repeat(1500))};
+  failedEcho["ipv4.icanhazip.com"]={reject:"network "+("F".repeat(1500))};
+  x=await run({tag:"ERROR-LENGTH",answers:failedEcho});
+  assert.ok(x.output.message.length<450);
+  assert.match(x.output.message,/双源：未确认/);
+
   // Failed local persistence must not be reported as saved.
   x=await run({tag:"SAVE-FAIL",answers:mocks(),saveOk:false});
   assert.match(x.output.message,/历史：保存失败/);
