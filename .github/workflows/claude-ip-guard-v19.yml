@@ -50,3 +50,16 @@ jobs:
         run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_compact_native_candidate.js
       - name: Run compact native dialog tests
         run: node Tests/Claude_IP_Guard_QX_v19_compact.test.cjs
+      - name: Check v19 release JavaScript syntax
+        run: node --check Scripts/Claude/Claude_IP_Guard_QX_v19.js
+      - name: Verify release matches validated RC3 except metadata
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const assert=require('node:assert/strict');
+          const candidate=fs.readFileSync('Scripts/Claude/v19/Claude_IP_Guard_QX_v19_compact_native_candidate.js','utf8');
+          const release=fs.readFileSync('Scripts/Claude/Claude_IP_Guard_QX_v19.js','utf8');
+          const normalize=s=>s.replace(/^\/\*\*[\s\S]*?\*\/\s*/, '').replace(/var VERSION = "[^"]+";/,'var VERSION = "VERSION";');
+          assert.equal(normalize(release),normalize(candidate),'Release logic differs from device-validated RC3');
+          console.log('PASS: release logic matches RC3');
+          NODE
