@@ -97,7 +97,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   const limited=mocks("1.1.1.1");
   limited["ipwho.is"]={status:429,body:"rate limited"};
   x=await run({tag:"RATE-LIMIT",answers:limited,prefs});
-  assert.match(x.output.message,/信誉：/);
+  assert.match(x.output.message,/信誉数据：/);
   assert.equal(JSON.parse(prefs.get("ClaudeIPGuard.v19.history.RATE-LIMIT")).count,1);
 
   // Primary geo HTTP 429 triggers a backup query through the SAME node.
@@ -107,7 +107,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   assert.equal(x.requests.length,4); // Reputation data for this IP was cached by earlier cases.
   assert.ok(x.requests.every(r=>r.opts.policy==="GEO-BACKUP"));
   assert.match(x.output.message,/备用来源/);
-  assert.match(x.output.message,/信誉：/);
+  assert.match(x.output.message,/信誉数据：/);
 
   // Backup's IP mismatch is rejected; no fabricated geo.
   const invalidBackup=mocks("1.1.1.1");
@@ -123,18 +123,18 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   first["api.ipapi.is"]={status:429,body:"rate limited"};
   x=await run({tag:"CACHE",answers:first,prefs:cachePrefs});
   assert.equal(x.requests.length,7);
-  assert.match(x.output.message,/信誉：/);
+  assert.match(x.output.message,/信誉数据：/);
   assert.equal(JSON.parse(cachePrefs.get("ClaudeIPGuard.v19.rep.1.1.1.1.ippure")).item.status,"ok");
   assert.equal(JSON.parse(cachePrefs.get("ClaudeIPGuard.v19.rep.1.1.1.1.ipapi")).item.status,"unavailable");
   const second=await run({tag:"CACHE",answers:first,prefs:cachePrefs});
   assert.equal(second.requests.length,3);
-  assert.match(second.output.message,/信誉：/);
+  assert.match(second.output.message,/信誉数据：/);
 
   // Missing provider IP must not be treated as a valid score.
   const missingIp=mocks("1.1.1.1");
   missingIp["my.ippure.com"]={body:JSON.stringify({fraudScore:0})};
   x=await run({tag:"BAD-PROVIDER",answers:missingIp});
-  assert.match(x.output.message,/信誉：/);
+  assert.match(x.output.message,/信誉数据：/);
 
   // Import legacy v17/v18 history without altering its original key.
   const legacyPrefs=new Map();
@@ -160,6 +160,12 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   x=await run({tag:"BAD",answers:mocks("1.1.1.1"),prefs:malformedPrefs});
   assert.equal(JSON.parse(malformedPrefs.get("ClaudeIPGuard.v19.history.BAD")).count,1);
   assert.match(x.output.message,/历史：已保存/);
+
+  // Reputation coverage must not be represented as a Claude ban-risk score.
+  x=await run({tag:"RISK-LABEL",answers:mocks("1.1.1.1")});
+  assert.match(x.output.message,/信誉数据：4\/4 家可用/);
+  assert.match(x.output.message,/信誉数据≠Claude封号风险/);
+  assert.doesNotMatch(x.output.message,/安全评分|封号概率/);
 
   // Native dialog must not contain HTML or unbounded report sections.
   x=await run({tag:"COMPACT",answers:mocks("1.1.1.1")});
