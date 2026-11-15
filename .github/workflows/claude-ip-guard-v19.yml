@@ -30,3 +30,7 @@ jobs:
         run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_geo_fallback_candidate.js
       - name: Execute geo fallback mocked tests
         run: node Tests/Claude_IP_Guard_QX_v19_geo.test.cjs
+      - name: Check reputation candidate syntax
+        run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_reputation_candidate.js
+      - name: Execute reputation cache mocked tests
+        run: node Tests/Claude_IP_Guard_QX_v19_reputation.test.cjs
