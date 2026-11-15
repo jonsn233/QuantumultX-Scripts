@@ -1,11 +1,11 @@
-# Claude IP Guard QX v17.0
+# Claude IP Guard QX v17.2
 
 ## Status
 
-- Branch: \`feature/claude-ip-guard-v17-node-aware\`
-- Implementation: created; not yet accepted on a real Quantumult X device.
-- v16A and the default branch are unchanged.
-- Automated mock tests are included but must be run with Node.js before release.
+- Release: v17.2 is merged into the default \`main\` branch.
+- The v16A script remains unchanged.
+- GitHub Actions syntax and mocked behavior tests passed for v17.2.
+- Real Quantumult X device acceptance is still required before treating node routing and UI rendering as verified.
 
 ## What changed
 
@@ -25,17 +25,17 @@ The script requests IPv4 from api.ipify.org and ipv4.icanhazip.com through the s
 Add this line to \`[task_local]\` (or add the same event-interaction task through the QX UI):
 
 \`\`\`ini
-event-interaction https://raw.githubusercontent.com/jonsn233/QuantumultX-Scripts/feature/claude-ip-guard-v17-node-aware/Scripts/Claude/Claude_IP_Guard_QX_v17.js, tag=Claude IP Guard v17, img-url=shield.lefthalf.filled, enabled=true
+event-interaction https://raw.githubusercontent.com/jonsn233/QuantumultX-Scripts/main/Scripts/Claude/Claude_IP_Guard_QX_v17.js, tag=Claude IP Guard v17.2, img-url=shield.lefthalf.filled, enabled=true
 \`\`\`
 
-Do not remove or replace the existing v16A task yet. Keep both versions available during acceptance.
+Keep the existing v16A task available during acceptance. Do not remove it until v17.2 passes the real-device checks.
 
 ## Acceptance procedure
 
 1. Confirm the QX Tunnel is running and the task switch is enabled.
-2. Long-press one individual server node (not a policy group) and run Claude IP Guard v17.
+2. Long-press one individual server node (not a policy group) and run Claude IP Guard v17.2.
 3. In QX Activity, verify each request marked \`FETCH\` is routed through the exact selected node tag.
-4. Confirm the two IP providers agree. If they disagree, v17 must show "无法确认" and must not save history or call ipwho.is.
+4. Confirm the two IP providers agree. If they disagree, v17.2 must show "无法确认" and must not save history or call ipwho.is.
 5. Long-press a second node and repeat. The displayed selected tag must change and each request must show the second node.
 6. Repeat the first node. Its history should remain separate from the second node's history.
 
@@ -45,7 +45,7 @@ Disable or remove only the v17 event-interaction task. v16A and the default bran
 
 ## Scope and limitations
 
-- IPv4 only in this first node-aware release; IPv6 is intentionally deferred.
+- IPv4 only in this node-aware release; IPv6 is intentionally deferred.
 - This measures the egress IP observed by two public echo services, not an IP attested by Anthropic/Claude.
 - Country, ASN, ISP and network type are third-party estimates.
 - It does not calculate account-ban probability or guarantee account acceptance.
