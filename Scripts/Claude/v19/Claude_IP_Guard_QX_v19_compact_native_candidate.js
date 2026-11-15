@@ -5,7 +5,7 @@
  */
 (function () {
   "use strict";
-  var VERSION = "19.0-compact-native-rc2";
+  var VERSION = "19.0-compact-native-rc3";
   var TIMEOUT_MS = 6500;
   var HISTORY_LIMIT = 30;
   var A = "https://api.ipify.org?format=json";
@@ -282,7 +282,7 @@
         "双源："+(agreed ? "一致" : "未确认"),
         "归属："+(g.ok ? [g.data.country,g.data.region].filter(Boolean).join(" / ") : "未知"),
         "历史："+(h ? (h.saved ? "已保存，累计"+h.state.count+"次，变化"+h.state.changes+"次" : "保存失败") : "未保存"),
-        "信誉："+(reputation ? REP_SOURCES.filter(function(k){return reputation[k].status==="ok";}).length+"/4 来源有效" : "未查询"),
+        "信誉数据："+(reputation ? REP_SOURCES.filter(function(k){return reputation[k].status==="ok";}).length+"/4 家可用" : "未查询"),
         "耗时："+(Date.now()-start)+"ms"
       ];
       if (!agreed) {
@@ -290,6 +290,7 @@
         lines.push("icanhazip："+brief(b.ok?b.data:b.error,80));
       }
       if (g.ok && g.data.source==="ipapi.co") lines.push("归属：备用来源");
+      lines.push("注：信誉数据≠Claude封号风险");
       lines.push("版本："+VERSION);
       var summary=lines.join("\n");
       finish("Claude IP Guard · 节点出口",summary);
