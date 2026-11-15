@@ -7,7 +7,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 const path = require("node:path");
-const SCRIPT = fs.readFileSync(path.join(__dirname, "../Scripts/Claude/v19/../Scripts/Claude/Claude_IP_Guard_QX_v19.js"), "utf8");
+const SCRIPT = fs.readFileSync(path.join(__dirname, "../Scripts/Claude/Claude_IP_Guard_QX_v19.js"), "utf8");
 
 function run({tag, answers = {}, prefs = new Map(), saveOk = true}) {
   const requests = [];
