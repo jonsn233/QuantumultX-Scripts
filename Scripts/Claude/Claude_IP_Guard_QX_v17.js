@@ -18,7 +18,7 @@
 (function () {
   "use strict";
 
-  var VERSION = "17.0";
+  var VERSION = "17.1";
   var TIMEOUT_MS = 12000;
   var MAX_HISTORY = 20;
   var IPV4_A = "https://api.ipify.org?format=json";
@@ -110,7 +110,22 @@
   }
 
   function parseIpify(body) {
-    return parseIPv4(body, "json");
+    var text = String(body || "").replace(/^\\uFEFF/, "").trim();
+    // ipify normally returns {"ip":"x.x.x.x"} for format=json.
+    // Some QX/network intermediaries may return a plain IPv4 body instead.
+    // Accept either representation, but never accept HTML or arbitrary text.
+    try {
+      var data = JSON.parse(text);
+      if (data && typeof data === "object" && !Array.isArray(data) && typeof data.ip === "string") {
+        return parseIPv4(data.ip, "text");
+      }
+      if (typeof data === "string") {
+        return parseIPv4(data, "text");
+      }
+    } catch (error) {
+      // Fall through to strict plain-IPv4 validation below.
+    }
+    return parseIPv4(text, "text");
   }
 
   function parsePlainIp(body) {
