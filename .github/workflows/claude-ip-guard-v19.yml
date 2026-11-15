@@ -1,0 +1,65 @@
+name: Claude IP Guard v19 candidate tests
+
+on:
+  push:
+    branches:
+      - dev/claude-ip-guard-v19
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mock-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check v19 JavaScript syntax
+        run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_engine_candidate.js
+      - name: Check v19 test syntax
+        run: node --check Tests/Claude_IP_Guard_QX_v19.test.cjs
+      - name: Execute mocked QX tests
+        run: node Tests/Claude_IP_Guard_QX_v19.test.cjs
+      - name: Check geo fallback candidate syntax
+        run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_geo_fallback_candidate.js
+      - name: Execute geo fallback mocked tests
+        run: node Tests/Claude_IP_Guard_QX_v19_geo.test.cjs
+      - name: Check reputation candidate syntax
+        run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_reputation_candidate.js
+      - name: Check reputation test syntax
+        run: node --check Tests/Claude_IP_Guard_QX_v19_reputation.test.cjs
+      - name: Execute reputation cache mocked tests
+        run: node Tests/Claude_IP_Guard_QX_v19_reputation.test.cjs
+      - name: Check dashboard candidate syntax
+        run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_dashboard_candidate.js
+      - name: Check dashboard test syntax
+        run: node --check Tests/Claude_IP_Guard_QX_v19_dashboard.test.cjs
+      - name: Execute dashboard and migration tests
+        run: node Tests/Claude_IP_Guard_QX_v19_dashboard.test.cjs
+      - name: Check release candidate syntax
+        run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_release_candidate.js
+      - name: Execute release candidate regression tests
+        run: node Tests/Claude_IP_Guard_QX_v19_release.test.cjs
+      - name: Check compact native candidate syntax
+        run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_compact_native_candidate.js
+      - name: Run compact native dialog tests
+        run: node Tests/Claude_IP_Guard_QX_v19_compact.test.cjs
+      - name: Check v19 release JavaScript syntax
+        run: node --check Scripts/Claude/Claude_IP_Guard_QX_v19.js
+      - name: Verify release matches validated RC3 except metadata
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const assert=require('node:assert/strict');
+          const candidate=fs.readFileSync('Scripts/Claude/v19/Claude_IP_Guard_QX_v19_compact_native_candidate.js','utf8');
+          const release=fs.readFileSync('Scripts/Claude/Claude_IP_Guard_QX_v19.js','utf8');
+          const normalize=s=>s.replace(/^\/\*\*[\s\S]*?\*\/\s*/, '').replace(/var VERSION = "[^"]+";/,'var VERSION = "VERSION";');
+          assert.equal(normalize(release),normalize(candidate),'Release logic differs from device-validated RC3');
+          console.log('PASS: release logic matches RC3');
+          NODE
