@@ -1,11 +1,11 @@
 /**
  * Claude IP Guard v19.0 engine candidate — Quantumult X UIAction.
- * Development branch only. Not yet device-validated.
+ * Development branch only. Compact native dialog validated on iPhone; full release pending.
  * Read-only, selected-node policy mandatory, no Claude credentials.
  */
 (function () {
   "use strict";
-  var VERSION = "19.0-compact-native-rc1";
+  var VERSION = "19.0-compact-native-rc2";
   var TIMEOUT_MS = 6500;
   var HISTORY_LIMIT = 30;
   var A = "https://api.ipify.org?format=json";
@@ -255,8 +255,12 @@
       return out;
     });
   }
+  function brief(value, max) {
+    var s=text(value).replace(/[\r\n\t]+/g," ").trim();
+    return s.length > max ? s.slice(0,max-1)+"…" : s;
+  }
   function finish(title, message) {
-    $done({title:"Claude IP Guard · v19",message:text(title)+"\n"+text(message)});
+    $done({title:"Claude IP Guard · v19",message:brief(title,60)+"\n"+text(message).slice(0,680)});
   }
   var tag = selectedTag();
   if (!tag) {
@@ -273,7 +277,7 @@
     return Promise.all([geo,rep]).then(function(results) {
       var g=results[0], reputation=results[1];
       var lines=[
-        "节点："+tag,
+        "节点："+brief(tag,64),
         "出口："+(ip || "未确认"),
         "双源："+(agreed ? "一致" : "未确认"),
         "归属："+(g.ok ? [g.data.country,g.data.region].filter(Boolean).join(" / ") : "未知"),
@@ -282,8 +286,8 @@
         "耗时："+(Date.now()-start)+"ms"
       ];
       if (!agreed) {
-        lines.push("ipify："+(a.ok?a.data:a.error));
-        lines.push("icanhazip："+(b.ok?b.data:b.error));
+        lines.push("ipify："+brief(a.ok?a.data:a.error,80));
+        lines.push("icanhazip："+brief(b.ok?b.data:b.error,80));
       }
       if (g.ok && g.data.source==="ipapi.co") lines.push("归属：备用来源");
       lines.push("版本："+VERSION);
