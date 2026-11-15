@@ -36,3 +36,9 @@ jobs:
         run: node --check Tests/Claude_IP_Guard_QX_v19_reputation.test.cjs
       - name: Execute reputation cache mocked tests
         run: node Tests/Claude_IP_Guard_QX_v19_reputation.test.cjs
+      - name: Check dashboard candidate syntax
+        run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_dashboard_candidate.js
+      - name: Check dashboard test syntax
+        run: node --check Tests/Claude_IP_Guard_QX_v19_dashboard.test.cjs
+      - name: Execute dashboard and migration tests
+        run: node Tests/Claude_IP_Guard_QX_v19_dashboard.test.cjs
