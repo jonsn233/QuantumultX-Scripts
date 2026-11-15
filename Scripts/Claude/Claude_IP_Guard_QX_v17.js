@@ -18,7 +18,7 @@
 (function () {
   "use strict";
 
-  var VERSION = "17.1";
+  var VERSION = "17.2";
   var TIMEOUT_MS = 12000;
   var MAX_HISTORY = 20;
   var IPV4_A = "https://api.ipify.org?format=json";
@@ -110,7 +110,7 @@
   }
 
   function parseIpify(body) {
-    var text = String(body || "").replace(/^\\uFEFF/, "").trim();
+    var text = String(body || "").replace(/^\uFEFF/, "").trim();
     // ipify normally returns {"ip":"x.x.x.x"} for format=json.
     // Some QX/network intermediaries may return a plain IPv4 body instead.
     // Accept either representation, but never accept HTML or arbitrary text.
@@ -209,38 +209,87 @@
     var place = intel && intel.ok
       ? safeText(intel.data.country) + " / " + safeText(intel.data.region) + " / " + safeText(intel.data.city)
       : "归属信息不可用";
+    var colorGreen = "#18804e";
+    var colorAmber = "#b7791f";
+    var colorBlue = "#315b90";
+    var colorMuted = "#64748b";
 
+    function tile(label, value, sub, color) {
+      return '<td width="50%" style="padding:4px;vertical-align:top"><div style="padding:7px 3px;text-align:center;min-height:56px"><div style="font-size:11px;color:#718096">' +
+        escapeHtml(label) + '</div><div style="font-size:15px;font-weight:700;color:' + color + '">' +
+        escapeHtml(value) + '</div><div style="font-size:10px;color:#94a3b8">' +
+        escapeHtml(sub) + '</div></div></td>';
+    }
     function row(label, value) {
-      return '<tr><td style="padding:5px 2px;color:#64748b;font-size:12px">' +
-        escapeHtml(label) + '</td><td style="padding:5px 2px;text-align:right;font-size:12px;font-weight:600">' +
-        escapeHtml(value) + "</td></tr>";
+      return '<tr><td style="padding:5px 2px;color:#718096;font-size:12px">' +
+        escapeHtml(label) + '</td><td style="padding:5px 2px;text-align:right;font-size:12px;font-weight:600;color:#111827">' +
+        escapeHtml(value) + '</td></tr>';
+    }
+    function section(label) {
+      return '<div style="font-size:13px;font-weight:700;color:' + colorBlue + ';margin:9px 0 2px">' +
+        escapeHtml(label) + '</div>';
+    }
+    function historyStrip(records) {
+      records = Array.isArray(records) ? records.slice(-10) : [];
+      if (!records.length) return '<div style="font-size:11px;color:#94a3b8;padding:4px 0">尚无有效历史采样</div>';
+      var marks = [];
+      var labels = [];
+      records.forEach(function (record, index) {
+        var mark = index === 0 ? "⚪" : (record.ip === records[index - 1].ip ? "🟢" : "🟠");
+        marks.push(mark);
+        labels.push(String(index + 1));
+      });
+      return '<div style="text-align:center;font-size:17px;letter-spacing:1px;white-space:nowrap">' +
+        marks.join(" ") + '</div><div style="text-align:center;font-size:10px;color:#64748b;letter-spacing:2px">' +
+        labels.join("　") + '</div><div style="font-size:10px;color:#718096;margin-top:3px">左→右：较早→最近 · ' +
+        records.length + ' 次有效采样</div><div style="font-size:10px;color:#64748b">⚪ 首个可见样本　🟢 与前次相同　🟠 与前次不同</div>' +
+        '<div style="font-size:10px;color:#64748b">仅比较已保存的采样记录，不代表两次采样间持续稳定。</div>';
     }
 
-    var html = '<div style="font-family:-apple-system,sans-serif;line-height:1.4;text-align:left">';
-    html += '<div style="padding:12px;border:1px solid #9fb5cc;border-radius:12px;text-align:center">';
-    html += '<div style="font-size:11px;color:#64748b">Claude IP Guard v' + VERSION + ' · 被测节点</div>';
-    html += '<div style="font-size:18px;font-weight:700;margin:4px 0">' + escapeHtml(policy) + '</div>';
-    html += '<div style="font-size:24px;font-weight:750;overflow-wrap:anywhere">' + escapeHtml(ip) + '</div>';
-    html += '<div style="font-size:12px;color:#64748b">' + escapeHtml(place) + '</div></div>';
-    html += '<table width="100%" cellspacing="0" cellpadding="0" style="margin-top:8px">';
+    var historyColor = history.saved ? colorGreen : colorAmber;
+    var html = '<div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.35;text-align:left;color:#111827">';
+    html += '<div style="padding:9px 5px 8px;text-align:center;border-bottom:1px solid #d7dee8">';
+    html += '<div style="font-size:11px;color:#718096">Claude IP Guard · 被测节点出口 IPv4</div>';
+    html += '<div style="font-size:27px;font-weight:750;letter-spacing:.2px;overflow-wrap:anywhere">' + escapeHtml(ip) + '</div>';
+    html += '<div style="font-size:12px;color:#334155">' + escapeHtml(place) + '</div>';
+    html += '<div style="font-size:11px;color:#718096">' + escapeHtml(intel && intel.ok ? intel.data.asn + " · " + intel.data.org : "ASN / 运营商未知") + '</div></div>';
+
+    html += '<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed;margin-top:5px"><tr>';
+    html += tile("双源出口校验", agree ? "一致" : "未通过", "ipify + icanhazip", agree ? colorGreen : colorAmber);
+    html += tile("IP 归属信息", intel && intel.ok ? "已获取" : "不可用", intel && intel.ok ? intel.data.countryCode : "第三方查询失败", intel && intel.ok ? colorGreen : colorMuted);
+    html += '</tr><tr>';
+    html += tile("节点策略", "已指定", policy, colorBlue);
+    html += tile("出口历史", history.status, (history.count || 0) + " 次采样 · " + (history.changes || 0) + " 次变化", historyColor);
+    html += '</tr></table>';
+
+    html += section("最近出口采样");
+    html += historyStrip(history.records);
+    html += '<table width="100%" cellspacing="0" cellpadding="0">';
+    html += row("上次有效 IP", history.previous || "无记录");
+    html += row("历史保存", history.saved ? "成功" : "未保存");
+    html += row("累计有效采样", history.count || 0);
+    html += row("累计 IP 变化", history.changes || 0);
+    html += '</table>';
+
+    html += section("出口身份");
+    html += '<table width="100%" cellspacing="0" cellpadding="0">';
+    html += row("请求策略", policy);
     html += row("IP 查询源 A · ipify", resultA.ok ? resultA.ip : resultA.error);
     html += row("IP 查询源 B · icanhazip", resultB.ok ? resultB.ip : resultB.error);
-    html += row("双源一致性", agree ? "一致" : "不一致 / 无法确认");
+    html += row("国家 / 地区 / 城市", intel && intel.ok ? place : "未知");
     html += row("ASN", intel && intel.ok ? intel.data.asn : "未知");
     html += row("组织", intel && intel.ok ? intel.data.org : "未知");
     html += row("ISP", intel && intel.ok ? intel.data.isp : "未知");
     html += row("网络类型", intel && intel.ok ? intel.data.type : "未知");
-    html += row("历史状态", history.status);
-    html += row("有效采样次数", history.count);
-    html += row("历史 IP 变化次数", history.changes);
-    html += row("上次记录 IP", history.previous);
-    html += row("本次耗时", (Date.now() - startedAt) + " ms");
-    html += "</table>";
-    html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #d1d9e3;font-size:10px;color:#718096">';
-    html += "路由策略来自 Quantumult X UIAction 传入的节点标签，并在每个请求中显式指定。请在 QX 活动记录中核对 FETCH 命中的策略。";
-    html += " IP 地理位置/ASN 是第三方估算；不代表 Claude 服务端确认的出口，也不构成账号风险或封禁概率判断。";
-    html += " 两个查询服务都会看到请求来源 IP；ipwho.is 还会收到待查询 IP。历史只保存在本机 QX 偏好存储中。";
-    html += "</div></div>";
+    html += row("归属数据源", intel && intel.ok ? "ipwho.is" : "不可用");
+    html += row("本次检测耗时", (Date.now() - startedAt) + " ms");
+    html += '</table>';
+
+    html += '<div style="margin-top:8px;padding-top:7px;border-top:1px solid #d1d9e3;font-size:10px;color:#718096">';
+    html += '本报告仅确认脚本请求所使用的策略及两个 IP 查询源的结果。实际节点路由请以 Quantumult X 活动记录中的 FETCH 策略为准。';
+    html += ' IP 地理位置、ASN、ISP 和网络类型为第三方估算，不代表 Claude 服务端确认的出口，也不构成账号风险或封禁概率判断。';
+    html += ' 当前版本尚未接入第三方 IP 信誉评分、DNS/IPv6 泄漏检测或长期稳定性评估。历史仅保存在本机 QX 偏好存储中。';
+    html += '</div></div>';
 
     console.log("Claude IP Guard v" + VERSION + " completed; policy=" + policy +
       "; sourceA=" + (resultA.ok ? "ok" : "failed") +
@@ -248,7 +297,7 @@
       "; agree=" + agree + "; historySaved=" + history.saved);
 
     $done({
-      title: "🛡 Claude IP Guard · v" + VERSION,
+      title: "🛡 Claude IP Guard · A v" + VERSION,
       htmlMessage: html
     });
   }
