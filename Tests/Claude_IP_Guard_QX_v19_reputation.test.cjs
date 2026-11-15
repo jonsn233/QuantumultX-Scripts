@@ -104,7 +104,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   const backup=mocks("1.1.1.1");
   backup["ipwho.is"]={status:429,body:"rate limited"};
   x=await run({tag:"GEO-BACKUP",answers:backup,prefs});
-  assert.equal(x.requests.length,8);
+  assert.equal(x.requests.length,4); // Reputation data for this IP was cached by earlier cases.
   assert.ok(x.requests.every(r=>r.opts.policy==="GEO-BACKUP"));
   assert.match(x.output.htmlMessage,/ipapi.co/);
   assert.match(x.output.htmlMessage,/HTTP 429/);
