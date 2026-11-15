@@ -5,7 +5,7 @@
  */
 (function () {
   "use strict";
-  var VERSION = "19.0-release-candidate";
+  var VERSION = "19.0-release-candidate-2";
   var TIMEOUT_MS = 6500;
   var HISTORY_LIMIT = 30;
   var A = "https://api.ipify.org?format=json";
@@ -259,8 +259,8 @@
   function finish(title, html) {
     $done({title:"Claude IP Guard · v19",htmlMessage:
       '<html><head><meta name="viewport" content="width=device-width,initial-scale=1">'+
-      '<style>body{font:-apple-system-body;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1e293b;margin:0;padding:18px;background:#f8fafc}'+
-      'h2{font-size:18px;margin:0 0 12px}h3{font-size:14px;color:#315d93;margin:16px 0 8px}'+
+      '<style>body{font:-apple-system-body;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1e293b;margin:0;padding:calc(28px + env(safe-area-inset-top, 0px)) 18px calc(24px + env(safe-area-inset-bottom, 0px));background:#f8fafc}'+
+      'h2{font-size:18px;margin:0 0 12px;padding-top:8px}h3{font-size:14px;color:#315d93;margin:16px 0 8px}'+
       '.ip{font-size:29px;font-weight:750;letter-spacing:-.6px;overflow-wrap:anywhere;margin:10px 0}'+
       '.sub{color:#64748b;font-size:12px;line-height:1.5}.r{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #e2e8f0;font-size:13px}'+
       '.r span{color:#64748b;flex:0 0 42%}.r b{font-weight:600;text-align:right;overflow-wrap:anywhere}'+
