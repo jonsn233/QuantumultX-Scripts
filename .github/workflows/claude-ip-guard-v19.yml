@@ -1,0 +1,28 @@
+name: Claude IP Guard v19 candidate tests
+
+on:
+  push:
+    branches:
+      - dev/claude-ip-guard-v19
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mock-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check v19 JavaScript syntax
+        run: node --check Scripts/Claude/v19/Claude_IP_Guard_QX_v19_engine_candidate.js
+      - name: Check v19 test syntax
+        run: node --check Tests/Claude_IP_Guard_QX_v19.test.cjs
+      - name: Execute mocked QX tests
+        run: node Tests/Claude_IP_Guard_QX_v19.test.cjs
