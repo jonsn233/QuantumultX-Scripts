@@ -6,6 +6,7 @@ on:
       - 'Tools/build_cn_adblock_batch.py'
       - 'Tools/test_build_cn_adblock_batch.py'
       - 'Tools/classify_cn_adblock_batch.py'
+      - 'Tools/corroborate_cn_adblock.py'
       - 'Tools/test_classify_cn_adblock_batch.py'
       - 'Rules/Releases/QX-V2.5-359-Rules.list'
       - 'Rules/Adblock/QX-V2.6-CN-Adblock-Test.list'
@@ -32,6 +33,8 @@ jobs:
         run: python3 Tools/build_cn_adblock_batch.py
       - name: Classify all candidate rules against production and pilot
         run: python3 Tools/classify_cn_adblock_batch.py
+      - name: Corroborate all candidates against independent lists (review only)
+        run: python3 Tools/corroborate_cn_adblock.py
       - name: Publish review summary to Actions run
         if: success()
         run: |
@@ -56,6 +59,14 @@ jobs:
           print(f"- Approved new rules: **{tier['approved_rules']}**")
           print(f"- V2.5 overlaps: {tier['reasons']['production_overlap']}")
           print(f"- Existing pilot overlaps: {tier['reasons']['pilot_overlap']}")
+          print()
+          corroboration = json.loads(Path("Rules/Adblock/Generated/QX-CN-Corroboration-Report.json").read_text(encoding="utf-8"))
+          print("### Full-batch independent list corroboration (not approval)")
+          print(f"- Successfully fetched sources: {corroboration['source_count']}")
+          for label, count in corroboration["match_buckets"].items():
+              print(f"- {label} source matches: {count}")
+          print(f"- Source failures: {corroboration['source_errors']}")
+          print("- All matched domains remain unapproved and not device-tested.")
           print()
           print("### First 20 A-tier candidates (review only)")
           print("| Rule | Host |")
@@ -92,4 +103,6 @@ jobs:
             Rules/Adblock/Generated/QX-CN-Tier-A-First100-REVIEW-ONLY.list
             Rules/Adblock/Generated/QX-CN-Tier-A-Manual-Audit.csv
             Rules/Adblock/Generated/QX-CN-Tier-Report.json
+            Rules/Adblock/Generated/QX-CN-All-Candidates-Corroboration-REVIEW-ONLY.csv
+            Rules/Adblock/Generated/QX-CN-Corroboration-Report.json
           retention-days: 14
