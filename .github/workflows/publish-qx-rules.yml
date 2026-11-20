@@ -8,6 +8,7 @@ on:
       - 'Rules/International/**'
       - 'Rules/Direct/**'
       - 'Tools/build_rules.py'
+      - '.github/workflows/publish-qx-rules.yml'
   workflow_dispatch:
 permissions:
   contents: write
@@ -26,6 +27,12 @@ jobs:
           python-version: '3.11'
       - name: Validate and build
         run: python3 Tools/build_rules.py
+      - name: Show publishing context
+        run: |
+          echo "Repository: ${GITHUB_REPOSITORY}"
+          echo "Ref: ${GITHUB_REF}"
+          git status --short
+          git remote -v | sed -E 's#(https://)[^/@]+@#\\1[REDACTED]@#g'
       - name: Commit only when changed
         shell: bash
         run: |
