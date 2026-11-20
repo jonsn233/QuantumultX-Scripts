@@ -1,0 +1,7 @@
+# Quantumult X V2.5 staged rules — AI-Claude
+# Publish only; do not enable until local duplicate rules are reconciled.
+HOST-SUFFIX,claude.ai
+HOST-SUFFIX,claude.com
+HOST-SUFFIX,anthropic.com
+HOST-SUFFIX,anthropicusercontent.com
+HOST-SUFFIX,claudeusercontent.com
