@@ -1,8 +1,10 @@
 # Quantumult X remote filter management
 
-- Published single bundle: [`QX-V2.5-All-Rules.list`](QX-V2.5-All-Rules.list) (108 explicit-policy rules).
-- Sources: `AI/`, `Media/`, `International/`, `Direct/`.
-- Current bundle is a **snapshot**; editing a source file does NOT automatically update it. Rebuild/publish bundle after source changes.
-- Do not apply `force-policy` to mixed-policy bundle.
-- Existing third-party YouTube/GitHub/Telegram and built-in LAN/CN resources are **not** included in the 108-rule bundle.
-- Do not remove them from live configuration until their coverage is reconciled.
+- Live single bundle: [QX-V2.5-All-Rules.list](QX-V2.5-All-Rules.list) (108 rules at initial publication).
+- Source modules: AI/, Media/, International/, Direct/.
+- Automated publisher: [publish-qx-rules.yml](../.github/workflows/publish-qx-rules.yml) runs Tools/build_rules.py on source changes.
+- Publisher checks syntax, duplicate domains, conflicting policies and unexpected rule-count drops. It only commits the bundle if validation passes.
+- GitHub Actions execution and permissions must be confirmed in the repository Actions tab; workflow existence alone does not prove successful automation.
+- Mixed-policy bundle uses explicit policy fields: never set force-policy on this subscription.
+- Third-party YouTube/GitHub/Telegram and built-in LAN/CN are NOT included in the bundle; keep them enabled until coverage is reconciled.
+- Do not upload airport tokens, certificates, private keys or passwords.
