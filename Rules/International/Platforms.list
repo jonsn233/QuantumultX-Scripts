@@ -1,0 +1,20 @@
+# Quantumult X V2.5 stage 2 — source: supplied V2.4 recovery configuration
+# STAGED ONLY: do not enable alongside local duplicates before migration.
+host-suffix,youtube.com,Intl-YouTube
+host-suffix,youtube-nocookie.com,Intl-YouTube
+host-suffix,youtu.be,Intl-YouTube
+host-suffix,googlevideo.com,Intl-YouTube
+host-suffix,ytimg.com,Intl-YouTube
+host,yt3.ggpht.com,Intl-YouTube
+host-suffix,github.com,Intl-GitHub
+host-suffix,githubusercontent.com,Intl-GitHub
+host-suffix,githubassets.com,Intl-GitHub
+host-suffix,github.io,Intl-GitHub
+host-suffix,github.dev,Intl-GitHub
+host-suffix,githubcopilot.com,Intl-GitHub
+host-suffix,google.com,Intl-Google
+host-suffix,google.com.hk,Intl-Google
+host-suffix,googleapis.com,Intl-Google
+host-suffix,gstatic.com,Intl-Google
+host-suffix,googleusercontent.com,Intl-Google
+host-suffix,google.com.tw,Intl-Google
