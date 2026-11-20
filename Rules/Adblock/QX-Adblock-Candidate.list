@@ -1,0 +1,5 @@
+# Quantumult X V2.6 adblock candidate — EMPTY, NOT FOR SUBSCRIPTION
+# Review upstream provenance, false positives, and device behavior before adding any rule.
+# Format: host,example-ad-domain.test,reject
+# Only explicit host and host-suffix rules with reject are eligible for staging.
+# No rewrite, no MitM, no scripts, no broad wildcard, no active production changes.
