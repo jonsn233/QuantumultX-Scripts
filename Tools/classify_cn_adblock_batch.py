@@ -69,7 +69,7 @@ def main():
     shortlist = sorted(tiers["A"], key=lambda x: (x[1], x[0]))[:100]
     (BASE / "QX-CN-Tier-A-First100-REVIEW-ONLY.list").write_text(
         "# FIRST 100 FOR MANUAL REVIEW ONLY - NOT APPROVED OR DEVICE TESTED\n"
-        + "".join(f"{k},{d},{p}\\n" for k, d, p in shortlist),
+        + "".join(f"{k},{d},{p}\n" for k, d, p in shortlist),
         encoding="utf-8")
     for tier, rules in tiers.items():
         (BASE / f"QX-CN-Tier-{tier}-REVIEW-ONLY.list").write_text(
