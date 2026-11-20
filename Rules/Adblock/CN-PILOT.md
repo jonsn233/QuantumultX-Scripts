@@ -60,3 +60,12 @@ Quantumult X network activity while using Baidu Maps:
 No REJECT is visible in the screenshot; this does not prove no other REJECT events occurred. Previously searched `dss0.bdstatic.com` had no records. Current five-rule pilot does not cover the two observed ad-related candidate domains.
 
 **Decision:** keep current production and five-rule test resource unchanged. Do not block `advlion.com` or `1rtb.net` at parent-domain level based solely on names. Verify endpoint role, exact-match scope, and A/B test effect before introducing a separately reviewed change. In particular, retain existing DIRECT for `cnloc.map.baidu.com` and Apple.
+
+## Third batch: observed domains cross-checked with community filters (2026-11-20)
+
+- `bj-td-menta-01-callback.advlion.com`: appeared as DIRECT in the user's QX log; exact hostname listed in AWAvenue Adguard filter: https://github.com/TG-Twilight/AWAvenue-Ads-Rule/blob/main/Filters/AWAvenue-Ads-Rule-Adguard.txt
+- `s.1rtb.net`: appeared as DIRECT in the same log; listed in community issue https://github.com/TG-Twilight/AWAvenue-Ads-Rule/issues/193 (report, not proof of efficacy).
+- Both staged as exact `host,...,reject` in the candidate and isolated test resource. Total **7** rules. Do not broaden to parent domain suffixes.
+- Existing enabled QX subscription will need a **manual remote resource refresh** to fetch these new lines. GitHub edits alone do not update the local cached copy.
+- To validate: refresh only V2.6 test subscription; reproduce relevant app traffic; verify both exact hosts show REJECT rather than GEOIP CN DIRECT; check map functions and unrelated domestic apps. If an app breaks, disable the test subscription to roll back.
+- Observed traffic and community inclusion support *testing*, not proof that blocking is harmless or removes visible ads.
