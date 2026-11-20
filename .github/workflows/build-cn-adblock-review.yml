@@ -67,11 +67,24 @@ jobs:
           else:
               print('Partial sources: no exact multi-source queue generated')
           PY
+      - name: Check V2.8 evidence readiness
+        id: v28_ready
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          report = json.loads(Path('Rules/Adblock/Generated/QX-CN-Corroboration-Report.json').read_text())
+          ready = report['source_completeness'] == 'complete' and report['source_count'] >= 2
+          print('ready=' + ('true' if ready else 'false'))
+          PY
       - name: Build V2.8 broad evidence inventory (review only)
+        if: steps.v28_ready.outputs.ready == 'true'
         run: python3 Tools/build_v28_broad_evidence.py
       - name: Build inactive V2.8 device pilot proposal
+        if: steps.v28_ready.outputs.ready == 'true'
         run: python3 Tools/build_v28_device_pilot_proposal.py
       - name: Build separate opt-in V2.8 test rules (not subscribed)
+        if: steps.v28_ready.outputs.ready == 'true'
         run: python3 Tools/build_v28_optin_pilot.py
       - name: Publish review summary to Actions run
         if: success()
@@ -119,10 +132,14 @@ jobs:
               print("- A-tier exact two-source review queue: NOT GENERATED (partial sources)")
           print("- All matched domains remain unapproved and not device-tested.")
           print()
-          broad = json.loads(Path("Rules/Adblock/Generated/QX-V2.8-Broad-Evidence-Report.json").read_text(encoding="utf-8"))
-          print("### V2.8 broad evidence (never auto-publish)")
-          for name, count in broad["buckets"].items():
-              print(f"- {name}: **{count}**")
+          broad_path = Path("Rules/Adblock/Generated/QX-V2.8-Broad-Evidence-Report.json")
+          if broad_path.exists():
+              broad = json.loads(broad_path.read_text(encoding="utf-8"))
+              print("### V2.8 broad evidence (never auto-publish)")
+              for name, count in broad["buckets"].items():
+                  print(f"- {name}: **{count}**")
+          else:
+              print("### V2.8 skipped: corroboration sources incomplete; no pilot generated")
           print("### First 20 A-tier candidates (review only)")
           print("| Rule | Host |")
           print("|---|---|")
