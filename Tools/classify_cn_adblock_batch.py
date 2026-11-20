@@ -33,10 +33,24 @@ def overlaps(a_kind, a_domain, b_kind, b_domain):
         return True
     return False
 
+# Ambiguous first-party and infrastructure domains must never be fast-tracked
+# solely because the first hostname label looks advertising-related.
+SENSITIVE_SUFFIXES = (
+    "tencentmusic.com", "wx.com", "139.com", "xhscdn.com",
+)
+SHORT_SECOND_LEVEL = re.compile(r"^[a-z0-9-]{1,3}\\.[a-z]{2,}$", re.I)
+
+def needs_manual_escalation(domain):
+    if any(domain == root or domain.endswith("." + root) for root in SENSITIVE_SUFFIXES):
+        return True
+    if SHORT_SECOND_LEVEL.fullmatch(domain):
+        return True
+    return False
+
 def classify(candidates, production, pilot):
     tiers = {"A": [], "B": [], "C": []}
     reasons = {"production_overlap": 0, "pilot_overlap": 0, "suffix_requires_review": 0,
-               "no_strong_ad_label": 0}
+               "no_strong_ad_label": 0, "sensitive_or_ambiguous": 0}
     for kind, domain, policy in candidates:
         if any(overlaps(kind, domain, pk, pd) for pk, pd, _ in production):
             tiers["C"].append((kind, domain, policy))
@@ -44,6 +58,9 @@ def classify(candidates, production, pilot):
         elif any(overlaps(kind, domain, pk, pd) for pk, pd, _ in pilot):
             tiers["C"].append((kind, domain, policy))
             reasons["pilot_overlap"] += 1
+        elif needs_manual_escalation(domain):
+            tiers["B"].append((kind, domain, policy))
+            reasons["sensitive_or_ambiguous"] += 1
         elif kind != "host":
             tiers["B"].append((kind, domain, policy))
             reasons["suffix_requires_review"] += 1
