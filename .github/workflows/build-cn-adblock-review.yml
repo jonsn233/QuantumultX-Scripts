@@ -95,6 +95,8 @@ jobs:
           if queue.exists():
               q = json.loads(queue.read_text(encoding="utf-8"))
               print(f"- A-tier exact two-source review queue: **{q['exact_multi_source_queue']}** (NOT approved)")
+              print(f"- Extra service-compatibility scrutiny: **{q['extra_scrutiny_count']}**")
+              print(f"- Standard review (still NOT approved): **{q['standard_review_count']}**")
           else:
               print("- A-tier exact two-source review queue: NOT GENERATED (partial sources)")
           print("- All matched domains remain unapproved and not device-tested.")
