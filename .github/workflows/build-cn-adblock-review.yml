@@ -51,6 +51,7 @@ jobs:
           print("### Risk-tier review (not approved)")
           for name, count in tier["tiers"].items():
               print(f"- Tier {name}: **{count}**")
+          print(f"- A-tier first-review shortlist: {tier['tier_A_first_review_count']}")
           print(f"- V2.5 overlaps: {tier['reasons']['production_overlap']}")
           print(f"- Existing pilot overlaps: {tier['reasons']['pilot_overlap']}")
           print()
@@ -67,5 +68,6 @@ jobs:
             Rules/Adblock/Generated/QX-CN-Adblock-Bulk-REVIEW-ONLY.list
             Rules/Adblock/Generated/QX-CN-Adblock-Bulk-Report.json
             Rules/Adblock/Generated/QX-CN-Tier-*-REVIEW-ONLY.list
+            Rules/Adblock/Generated/QX-CN-Tier-A-First100-REVIEW-ONLY.list
             Rules/Adblock/Generated/QX-CN-Tier-Report.json
           retention-days: 14
