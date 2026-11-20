@@ -44,7 +44,7 @@ class ExactQueueTests(unittest.TestCase):
     def test_sensitive_service_gets_extra_scrutiny(self):
         self.rows[0][1] = "ad.zijieapi.com"
         (self.base / "QX-CN-Tier-A-REVIEW-ONLY.list").write_text(
-            "host,ad.zijieapi.com,reject\\nhost,ad.other.net,reject\\n")
+            "host,ad.zijieapi.com,reject\nhost,ad.other.net,reject\n")
         self.write_matrix()
         result = build(self.base)
         self.assertEqual(result["extra_scrutiny_count"], 1)
