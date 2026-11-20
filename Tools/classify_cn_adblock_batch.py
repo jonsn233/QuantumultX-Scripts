@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Risk-tier bulk adblock candidates. Review artifacts only, never live subscriptions."""
+import csv
 import hashlib
 import json
 import re
@@ -99,10 +100,23 @@ def main():
             "# NOT APPROVED, NOT DEVICE TESTED, DO NOT SUBSCRIBE\n"
             + "".join(f"{k},{d},{p}\n" for k,d,p in sorted(rules)),
             encoding="utf-8")
+    # Complete review worksheet: no domain receives approval automatically.
+    # This CSV is deliberately non-subscribable and includes all A-tier hosts.
+    ledger = BASE / "QX-CN-Tier-A-Manual-Audit.csv"
+    with ledger.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["rule_type", "domain", "policy", "review_status",
+                         "evidence_url", "app_impact_test", "reviewer_notes"])
+        for kind, domain, policy in sorted(tiers["A"], key=lambda item: item[1]):
+            writer.writerow([kind, domain, policy, "PENDING", "", "NOT_TESTED", ""])
+    if sum(1 for _ in ledger.open(encoding="utf-8")) != len(tiers["A"]) + 1:
+        raise SystemExit("Manual audit worksheet count mismatch")
     report = {"status": "review_only", "published": False,
               "candidate_total": len(candidates),
               "tiers": {key: len(value) for key, value in tiers.items()},
               "tier_A_first_review_count": len(shortlist),
+              "tier_A_manual_audit_pending": len(tiers["A"]),
+              "approved_rules": 0,
               "first_review_selection": "sha256-ranked deterministic sample across A tier",
               "reasons": reasons,
               "tier_A_warning": "Lexical ad label is not proof of safe blocking.",
