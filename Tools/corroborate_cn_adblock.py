@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Independent-source corroboration, review-only. No publication or approvals."""
-import hashlib
+import re
 import json
 import urllib.request
 from pathlib import Path
@@ -24,11 +24,13 @@ def normalize(line):
     elif s.startswith("0.0.0.0 ") or s.startswith("127.0.0.1 "):
         fields = s.split()
         s = fields[1] if len(fields) == 2 else ""
-    else:
+    elif s.startswith("@@") or any(ch in s for ch in ("/", "*", "$", "|", "^", " ", "\\t")):
         return None
+    # OISD domain-only feeds contain bare hostnames (one per line).
     if not s or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789.-" for c in s):
         return None
-    if "." not in s or s.startswith(".") or s.endswith(".") or ".." in s:
+    if ("." not in s or s.startswith(".") or s.endswith(".") or ".." in s
+            or any(not label or label.startswith("-") or label.endswith("-") or len(label) > 63 for label in s.split("."))):
         return None
     return s
 
@@ -75,7 +77,7 @@ def main():
         w = csv.writer(fp)
         w.writerow(["kind", "domain", "matched_source_count", "matched_sources",
                     "review_status", "device_test"])
-        for kind, domain in candidates:
+        for kind, domain in sorted(candidates):
             hits = [name for name, domains in source_data.items() if covered(domain, domains)]
             buckets["zero" if not hits else "one" if len(hits) == 1 else "multiple"] += 1
             w.writerow([kind, domain, len(hits), ";".join(hits), "UNAPPROVED", "NOT_TESTED"])
