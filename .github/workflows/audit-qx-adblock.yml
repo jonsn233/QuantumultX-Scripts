@@ -1,0 +1,22 @@
+name: Audit QX adblock candidate (staging only)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Rules/Adblock/**'
+      - 'Tools/audit_adblock_candidate.py'
+      - '.github/workflows/audit-qx-adblock.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate isolated adblock candidate
+        run: python3 Tools/audit_adblock_candidate.py
