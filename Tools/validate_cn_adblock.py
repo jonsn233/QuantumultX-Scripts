@@ -7,6 +7,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 PILOT = ROOT / "Rules/Adblock/QX-V2.6-CN-Adblock-Test.list"
 RELEASE = ROOT / "Rules/Releases/QX-V2.5-359-Rules.list"
+CANDIDATE = ROOT / "Rules/Adblock/QX-Adblock-Candidate.list"
 ALLOWED = {"host", "host-suffix"}
 PROTECTED = (
     "apple.com", "icloud.com", "icloud.com.cn", "baidu.com",
@@ -38,6 +39,18 @@ for number, raw in enumerate(PILOT.read_text(encoding="utf-8").splitlines(), 1):
             errors.append(f"line {number}: overlaps protected service {safe}")
     if domain.startswith("*.") or domain in {"com", "cn", "net"}:
         errors.append(f"line {number}: overly broad domain")
+candidate_rules = {
+    line.strip().lower() for line in CANDIDATE.read_text(encoding="utf-8").splitlines()
+    if line.strip() and not line.lstrip().startswith(("#", ";"))
+}
+pilot_rules = {
+    line.strip().lower() for line in PILOT.read_text(encoding="utf-8").splitlines()
+    if line.strip() and not line.lstrip().startswith(("#", ";"))
+}
+if pilot_rules != candidate_rules:
+    errors.append("pilot and reviewed candidate differ; review before publishing")
+if count > 200:
+    errors.append("pilot exceeds 200-rule cap")
 if not RELEASE.is_file():
     errors.append("V2.5 release missing")
 else:
