@@ -1,9 +1,12 @@
 """Regression tests for the review-only bulk adblock builder."""
 import sys
 import unittest
+import io
+import urllib.error
+from unittest.mock import patch
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_cn_adblock_batch import parse, is_protected
+from build_cn_adblock_batch import parse, is_protected, fetch
 
 class BulkBuilderTests(unittest.TestCase):
     def test_rejects_non_ad_policies(self):
@@ -25,6 +28,26 @@ class BulkBuilderTests(unittest.TestCase):
         rules, stats = parse(b"DOMAIN,ads.example,REJECT\nHOST,ads.example,reject\n")
         self.assertEqual(len(rules), 1)
         self.assertEqual(stats["duplicates"], 1)
+
+    def test_transient_503_retries_and_recovers(self):
+        class Response:
+            headers = {"Content-Length": "3"}
+            def __enter__(self): return self
+            def __exit__(self, *args): return False
+            def read(self, n): return b"abc"
+        with patch("build_cn_adblock_batch.urllib.request.urlopen",
+                   side_effect=[urllib.error.HTTPError("url", 503, "busy", {}, None), Response()]) as opener:
+            delays = []
+            self.assertEqual(fetch("https://example.test/list", 100, sleep=delays.append), b"abc")
+            self.assertEqual(opener.call_count, 2)
+            self.assertEqual(delays, [3])
+
+    def test_non_transient_404_fails_without_retry(self):
+        with patch("build_cn_adblock_batch.urllib.request.urlopen",
+                   side_effect=urllib.error.HTTPError("url", 404, "missing", {}, None)) as opener:
+            with self.assertRaises(urllib.error.HTTPError):
+                fetch("https://example.test/list", 100, sleep=lambda _: None)
+            self.assertEqual(opener.call_count, 1)
 
     def test_protected_parent(self):
         self.assertTrue(is_protected("com"))
