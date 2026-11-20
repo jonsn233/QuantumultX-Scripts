@@ -7,6 +7,7 @@ on:
       - 'Tools/test_build_cn_adblock_batch.py'
       - 'Tools/classify_cn_adblock_batch.py'
       - 'Tools/corroborate_cn_adblock.py'
+      - 'Tools/test_corroborate_cn_adblock.py'
       - 'Tools/test_classify_cn_adblock_batch.py'
       - 'Rules/Releases/QX-V2.5-359-Rules.list'
       - 'Rules/Adblock/QX-V2.6-CN-Adblock-Test.list'
@@ -29,6 +30,8 @@ jobs:
         run: python3 -m unittest discover -s Tools -p "test_build_cn_adblock_batch.py" -v
       - name: Run tier classification regression tests
         run: python3 -m unittest discover -s Tools -p "test_classify_cn_adblock_batch.py" -v
+      - name: Run independent-source parser regression tests
+        run: python3 -m unittest discover -s Tools -p "test_corroborate_cn_adblock.py" -v
       - name: Build isolated review candidate and provenance report
         run: python3 Tools/build_cn_adblock_batch.py
       - name: Classify all candidate rules against production and pilot
