@@ -1,0 +1,9 @@
+# Quantumult X V2.5 staged rules — AI-OpenAI
+# Publish only; do not enable until local duplicate rules are reconciled.
+HOST-SUFFIX,chatgpt.com
+HOST-SUFFIX,openai.com
+HOST-SUFFIX,oaistatic.com
+HOST-SUFFIX,openaiapi-site.azureedge.net
+HOST-SUFFIX,chatgptusercontent.com
+HOST-SUFFIX,oaiusercontent.com
+HOST-SUFFIX,auth.openai.com
