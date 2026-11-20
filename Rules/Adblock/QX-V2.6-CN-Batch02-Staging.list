@@ -1,0 +1,9 @@
+# V2.6 CN adblock Batch 02 — STAGING ONLY, NOT SUBSCRIBED
+# Source: https://github.com/fmz200/wool_scripts/blob/main/QuantumultX/rewrite/weibo.snippet
+# Source last self-reported date: 2025-12-16; behavior may have changed.
+# Only exact ad-oriented Weibo hosts selected from source.
+# No URL rewrites, script injection, MitM, generic Weibo API blocks or push gateways.
+host,ad.weibo.com,reject
+host,adimg.uve.weibo.com,reject
+host,bootpreload.uve.weibo.com,reject
+# Not approved for the currently enabled 9-rule test subscription.
