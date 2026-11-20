@@ -63,6 +63,17 @@ jobs:
               kind, domain, _ = line.split(",")
               print(f"| {kind} | `{domain}\` |")
           print()
+          print("### Complete A-tier inventory (review only; NOT approved)")
+          print("| # | Host |")
+          print("|---:|---|")
+          full = Path("Rules/Adblock/Generated/QX-CN-Tier-A-REVIEW-ONLY.list")
+          full_rules = [s for s in full.read_text(encoding="utf-8").splitlines() if s and not s.startswith("#")]
+          assert len(full_rules) == tier["tiers"]["A"], "A-tier inventory count mismatch"
+          for i, line in enumerate(full_rules, 1):
+              kind, domain, policy = line.split(",")
+              assert kind == "host" and policy == "reject", "Unexpected A-tier rule"
+              print(f"| {i} | `{domain}` |")
+          print()
           print("| Audit metric | Count |")
           print("|---|---:|")
           for key, value in d["counts"].items():
