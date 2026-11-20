@@ -1,0 +1,5 @@
+# Quantumult X V2.5 staged rules — AI-Gemini
+# Publish only; do not enable until local duplicate rules are reconciled.
+HOST,geminiweb-pa.clients6.google.com
+HOST,gemini.google.com
+HOST,aistudio.google.com
