@@ -7,6 +7,8 @@ Standard library only. Run with --offline for deterministic local fixtures.
 import argparse
 import hashlib
 import json
+import time
+import urllib.error
 import re
 import urllib.request
 from pathlib import Path
@@ -32,14 +34,33 @@ def is_protected(domain):
     return any(domain == root or domain.endswith("." + root) or root.endswith("." + domain)
                for root in PROTECTED)
 
-def fetch(url, max_bytes):
-    with urllib.request.urlopen(urllib.request.Request(url, headers={
+def fetch(url, max_bytes, attempts=4, sleep=time.sleep):
+    """Retry transient HTTP/transport failures; never accept partial content."""
+    if attempts < 1:
+        raise ValueError("attempts must be positive")
+    request = urllib.request.Request(url, headers={
         "User-Agent": "QX-CN-Adblock-Review-Builder/1.0"
-    }), timeout=25) as response:
-        data = response.read(max_bytes + 1)
-    if len(data) > max_bytes:
-        raise ValueError("upstream exceeds byte cap")
-    return data
+    })
+    for attempt in range(attempts):
+        try:
+            with urllib.request.urlopen(request, timeout=25) as response:
+                data = response.read(max_bytes + 1)
+                expected = response.headers.get("Content-Length")
+                if expected is not None and len(data) != int(expected):
+                    raise ValueError("upstream content-length mismatch")
+            if len(data) > max_bytes:
+                raise ValueError("upstream exceeds byte cap")
+            return data
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as exc:
+            transient = not isinstance(exc, urllib.error.HTTPError) or exc.code in (
+                408, 429, 500, 502, 503, 504
+            )
+            if not transient or attempt == attempts - 1:
+                raise
+            delay = min(2 ** attempt * 3, 15)
+            print(f"Transient upstream error; retry {attempt + 2}/{attempts} after {delay}s")
+            sleep(delay)
+    raise RuntimeError("unreachable")
 
 def parse(raw):
     counts = {"input_lines": 0, "unsupported": 0, "non_reject": 0, "protected": 0,
