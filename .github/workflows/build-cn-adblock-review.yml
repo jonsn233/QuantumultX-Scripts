@@ -6,6 +6,7 @@ on:
       - 'Tools/build_cn_adblock_batch.py'
       - 'Tools/test_build_cn_adblock_batch.py'
       - 'Tools/classify_cn_adblock_batch.py'
+      - 'Tools/test_classify_cn_adblock_batch.py'
       - 'Rules/Releases/QX-V2.5-359-Rules.list'
       - 'Rules/Adblock/QX-V2.6-CN-Adblock-Test.list'
       - '.github/workflows/build-cn-adblock-review.yml'
@@ -25,6 +26,8 @@ jobs:
           python-version: '3.11'
       - name: Run bulk builder regression tests
         run: python3 -m unittest discover -s Tools -p "test_build_cn_adblock_batch.py" -v
+      - name: Run tier classification regression tests
+        run: python3 -m unittest discover -s Tools -p "test_classify_cn_adblock_batch.py" -v
       - name: Build isolated review candidate and provenance report
         run: python3 Tools/build_cn_adblock_batch.py
       - name: Classify all candidate rules against production and pilot
