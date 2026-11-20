@@ -41,6 +41,17 @@ class ExactQueueTests(unittest.TestCase):
         self.assertEqual(len(lines), 2)
         self.assertIn("ads.example.com", lines[1])
 
+    def test_sensitive_service_gets_extra_scrutiny(self):
+        self.rows[0][1] = "ad.zijieapi.com"
+        (self.base / "QX-CN-Tier-A-REVIEW-ONLY.list").write_text(
+            "host,ad.zijieapi.com,reject\\nhost,ad.other.net,reject\\n")
+        self.write_matrix()
+        result = build(self.base)
+        self.assertEqual(result["extra_scrutiny_count"], 1)
+        self.assertEqual(result["standard_review_count"], 0)
+        output = (self.base / "QX-CN-A-Exact-MultiSource-QUEUE-REVIEW-ONLY.csv").read_text()
+        self.assertIn("EXTRA_SCRUTINY", output)
+
     def test_partial_sources_fail_closed(self):
         (self.base / "QX-CN-Corroboration-Report.json").write_text(
             json.dumps({"source_completeness": "partial", "source_count": 1}))
