@@ -42,7 +42,7 @@ def fetch(url, max_bytes):
     return data
 
 def parse(raw):
-    counts = {"input_lines": 0, "unsupported": 0, "protected": 0,
+    counts = {"input_lines": 0, "unsupported": 0, "non_reject": 0, "protected": 0,
               "invalid": 0, "duplicates": 0}
     accepted = set()
     for line in raw.decode("utf-8-sig").splitlines():
@@ -53,6 +53,10 @@ def parse(raw):
         fields = [s.strip().lower() for s in line.split(",")]
         if len(fields) < 2 or fields[0] not in ("host", "host-suffix", "domain", "domain-suffix"):
             counts["unsupported"] += 1
+            continue
+        # Never convert an upstream DIRECT/PROXY policy into a REJECT.
+        if len(fields) > 2 and fields[2] not in ("reject", "reject-drop", "reject-200"):
+            counts["non_reject"] += 1
             continue
         kind = "host-suffix" if fields[0] in ("host-suffix", "domain-suffix") else "host"
         domain = fields[1]
@@ -78,6 +82,8 @@ def main():
     if len(raw) > args.max_bytes:
         raise ValueError("input exceeds byte cap")
     rules, counts = parse(raw)
+    if not rules:
+        raise ValueError("zero usable candidate rules; refusing empty artifact")
     OUT.mkdir(parents=True, exist_ok=True)
     output = OUT / "QX-CN-Adblock-Bulk-REVIEW-ONLY.list"
     report = OUT / "QX-CN-Adblock-Bulk-Report.json"
