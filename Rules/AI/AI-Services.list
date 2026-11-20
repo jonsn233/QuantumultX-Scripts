@@ -1,0 +1,18 @@
+# Quantumult X V2.5 — AI-specific routing rules
+# Stage 1: published only, not activated. Maintain exact V2.4 policy names.
+# Source: previously imported V2.4 recovery config; no tokens, no certificates.
+HOST-SUFFIX,chatgpt.com,AI-OpenAI
+HOST-SUFFIX,openai.com,AI-OpenAI
+HOST-SUFFIX,oaistatic.com,AI-OpenAI
+HOST-SUFFIX,openaiapi-site.azureedge.net,AI-OpenAI
+HOST-SUFFIX,chatgptusercontent.com,AI-OpenAI
+HOST-SUFFIX,oaiusercontent.com,AI-OpenAI
+HOST-SUFFIX,auth.openai.com,AI-OpenAI
+HOST-SUFFIX,claude.ai,AI-Claude
+HOST-SUFFIX,claude.com,AI-Claude
+HOST-SUFFIX,anthropic.com,AI-Claude
+HOST-SUFFIX,anthropicusercontent.com,AI-Claude
+HOST-SUFFIX,claudeusercontent.com,AI-Claude
+HOST,geminiweb-pa.clients6.google.com,AI-Gemini
+HOST,gemini.google.com,AI-Gemini
+HOST,aistudio.google.com,AI-Gemini
