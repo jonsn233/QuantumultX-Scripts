@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'Tools/stage_third_party.py'
+      - 'Tools/build_merged_candidate.py'
       - '.github/workflows/audit-qx-third-party.yml'
   workflow_dispatch:
 permissions:
@@ -19,6 +20,8 @@ jobs:
           python-version: '3.11'
       - name: Download, normalize and audit upstream rules
         run: python3 Tools/stage_third_party.py
+      - name: Build isolated combined candidate
+        run: python3 Tools/build_merged_candidate.py
       - name: Upload staging artifacts only
         uses: actions/upload-artifact@v4
         with:
@@ -26,4 +29,6 @@ jobs:
           path: |
             Rules/staging/QX-Third-Party-Candidate.list
             Rules/staging/QX-Third-Party-Audit.json
+            Rules/staging/QX-V2.5-Merged-Candidate.list
+            Rules/staging/QX-V2.5-Merge-Report.json
           if-no-files-found: error
