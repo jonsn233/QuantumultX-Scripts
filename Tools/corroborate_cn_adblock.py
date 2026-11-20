@@ -20,7 +20,11 @@ def normalize(line):
     if not s or s.startswith(("!", "#", "[", ";", "//")):
         return None
     if s.startswith("||"):
-        s = s[2:].split("^", 1)[0]
+        # Reject modifiers/options before stripping the ABP rule terminator.
+        # A rule with $third-party, $important, etc. is not a plain domain block.
+        if "$" in s or not s.endswith("^") or s.count("^") != 1:
+            return None
+        s = s[2:-1]
     elif s.startswith("0.0.0.0 ") or s.startswith("127.0.0.1 "):
         fields = s.split()
         s = fields[1] if len(fields) == 2 else ""
