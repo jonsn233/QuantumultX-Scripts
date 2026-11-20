@@ -37,6 +37,7 @@ def overlaps(a_kind, a_domain, b_kind, b_domain):
 # solely because the first hostname label looks advertising-related.
 SENSITIVE_SUFFIXES = (
     "tencentmusic.com", "wx.com", "139.com", "xhscdn.com",
+    "pplive.com", "cibntv.net",
 )
 SHORT_SECOND_LEVEL = re.compile(r"^[a-z0-9-]{1,3}\.[a-z]{2,}$", re.I)
 
