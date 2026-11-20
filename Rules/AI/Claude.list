@@ -1,7 +1,7 @@
 # Quantumult X V2.5 staged rules — AI-Claude
-# Remote rules; policy is explicitly included for Quantumult X parser compatibility.
-HOST-SUFFIX,claude.ai,AI-Claude
-HOST-SUFFIX,claude.com,AI-Claude
-HOST-SUFFIX,anthropic.com,AI-Claude
-HOST-SUFFIX,anthropicusercontent.com,AI-Claude
-HOST-SUFFIX,claudeusercontent.com,AI-Claude
+# Quantumult X native lowercase rule types, with explicit policy.
+host-suffix,claude.ai,AI-Claude
+host-suffix,claude.com,AI-Claude
+host-suffix,anthropic.com,AI-Claude
+host-suffix,anthropicusercontent.com,AI-Claude
+host-suffix,claudeusercontent.com,AI-Claude
