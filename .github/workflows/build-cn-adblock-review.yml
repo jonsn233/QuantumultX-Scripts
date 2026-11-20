@@ -12,6 +12,8 @@ on:
       - 'Tools/test_build_v28_broad_evidence.py'
       - 'Tools/build_v28_device_pilot_proposal.py'
       - 'Tools/test_build_v28_device_pilot_proposal.py'
+      - 'Tools/build_v28_optin_pilot.py'
+      - 'Tools/test_build_v28_optin_pilot.py'
       - 'Tools/test_build_cn_exact_review_queue.py'
       - 'Tools/test_corroborate_cn_adblock.py'
       - 'Tools/test_classify_cn_adblock_batch.py'
@@ -44,6 +46,8 @@ jobs:
         run: python3 -m unittest discover -s Tools -p "test_build_v28_broad_evidence.py" -v
       - name: Test inactive V2.8 pilot proposal
         run: python3 -m unittest discover -s Tools -p "test_build_v28_device_pilot_proposal.py" -v
+      - name: Test isolated V2.8 opt-in pilot
+        run: python3 -m unittest discover -s Tools -p "test_build_v28_optin_pilot.py" -v
       - name: Build isolated review candidate and provenance report
         run: python3 Tools/build_cn_adblock_batch.py
       - name: Classify all candidate rules against production and pilot
@@ -67,6 +71,8 @@ jobs:
         run: python3 Tools/build_v28_broad_evidence.py
       - name: Build inactive V2.8 device pilot proposal
         run: python3 Tools/build_v28_device_pilot_proposal.py
+      - name: Build separate opt-in V2.8 test rules (not subscribed)
+        run: python3 Tools/build_v28_optin_pilot.py
       - name: Publish review summary to Actions run
         if: success()
         run: |
@@ -160,4 +166,6 @@ jobs:
             Rules/Adblock/Generated/QX-V2.8-Broad-Evidence-Report.json
             Rules/Adblock/Generated/QX-V2.8-Device-Pilot-PROPOSAL-NOT-ACTIVE.txt
             Rules/Adblock/Generated/QX-V2.8-Device-Pilot-PROPOSAL-Report.json
+            Rules/Adblock/Generated/QX-V2.8-OptIn-50-DEVICE-TEST-ONLY.list
+            Rules/Adblock/Generated/QX-V2.8-OptIn-50-Report.json
           retention-days: 14
