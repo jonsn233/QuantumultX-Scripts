@@ -14,6 +14,7 @@ on:
       - 'Tools/test_build_v28_device_pilot_proposal.py'
       - 'Tools/build_v28_optin_pilot.py'
       - 'Tools/test_build_v28_optin_pilot.py'
+      - 'Tools/validate_v28_optin_pilot.py'
       - 'Tools/test_build_cn_exact_review_queue.py'
       - 'Tools/test_corroborate_cn_adblock.py'
       - 'Tools/test_classify_cn_adblock_batch.py'
@@ -86,6 +87,9 @@ jobs:
       - name: Build separate opt-in V2.8 test rules (not subscribed)
         if: steps.v28_ready.outputs.ready == 'true'
         run: python3 Tools/build_v28_optin_pilot.py
+      - name: Validate isolated opt-in pilot before artifact upload
+        if: steps.v28_ready.outputs.ready == 'true'
+        run: python3 Tools/validate_v28_optin_pilot.py
       - name: Publish review summary to Actions run
         if: success()
         run: |
