@@ -17,7 +17,7 @@ SOURCES = {
     "blackmatrix7-advertising-lite":
         "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list",
 }
-DOMAIN = re.compile(r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z][a-z0-9-]{1,62}$", re.I)
+DOMAIN = re.compile(r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}$", re.I)
 # Protect full service roots AND their subdomains; review can relax this later.
 PROTECTED = (
     "apple.com", "icloud.com", "icloud.com.cn", "mzstatic.com",
@@ -81,8 +81,8 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     output = OUT / "QX-CN-Adblock-Bulk-REVIEW-ONLY.list"
     report = OUT / "QX-CN-Adblock-Bulk-Report.json"
-    output.write_text("# GENERATED REVIEW ONLY - DO NOT SUBSCRIBE OR PUBLISH AUTOMATICALLY\\n"
-                      + "".join(f"{kind},{domain},reject\\n" for kind, domain in sorted(rules)),
+    output.write_text("# GENERATED REVIEW ONLY - DO NOT SUBSCRIBE OR PUBLISH AUTOMATICALLY\n"
+                      + "".join(f"{kind},{domain},reject\n" for kind, domain in sorted(rules)),
                       encoding="utf-8")
     report.write_text(json.dumps({
         "status": "unreviewed_not_device_tested", "active_publish": False,
@@ -91,7 +91,7 @@ def main():
         "accepted_count": len(rules), "counts": counts,
         "protected_roots": list(PROTECTED),
         "notes": "Domain-only safety filter cannot establish harmlessness or efficacy."
-    }, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"accepted": len(rules), "counts": counts, "output": str(output)}))
 
 if __name__ == "__main__":
