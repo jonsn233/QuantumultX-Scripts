@@ -1,5 +1,8 @@
-# Quantumult X V2.6 adblock candidate — EMPTY, NOT FOR SUBSCRIPTION
-# Review upstream provenance, false positives, and device behavior before adding any rule.
-# Format: host,example-ad-domain.test,reject
-# Only explicit host and host-suffix rules with reject are eligible for staging.
-# No rewrite, no MitM, no scripts, no broad wildcard, no active production changes.
+# Quantumult X V2.6 CN-first adblock candidate — STAGING ONLY
+# Source: blackmatrix7/ios_rule_script source/rule/Advertising/LianXiangJia/LianXiangJia.list
+# https://github.com/blackmatrix7/ios_rule_script/blob/master/source/rule/Advertising/LianXiangJia/LianXiangJia.list
+# Original source syntax DOMAIN -> QX host; individually scoped, no wildcard.
+# This is NOT subscribed or merged into V2.5 production. Device efficacy unverified.
+# Pilot: explicitly ad-named hosts only; do not automatically import other entries.
+host,ad.hori-gz.com,reject
+host,adfile.hori-gz.com,reject
