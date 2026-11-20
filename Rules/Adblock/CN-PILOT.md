@@ -29,3 +29,21 @@ Exact upstream: https://github.com/blackmatrix7/ios_rule_script/blob/master/sour
 - `URL-REGEX,^https?...cdn-1rtb.caiyunapp.com/creative/...,REJECT` — upstream comment: 彩云天气开屏广告; **not imported**, because this pilot permits domain rules only and does not authorize URL rewrite or MitM.
 
 Five total staged domains; none enabled. Upstream labeling is not device proof. Baidu's `bdstatic.com` is a shared parent; only exact `dss0.bdstatic.com` is eligible, never the entire suffix.
+
+## Isolated opt-in test resource (published, NOT enabled)
+
+URL: https://raw.githubusercontent.com/jonsn233/QuantumultX-Scripts/main/Rules/Adblock/QX-V2.6-CN-Adblock-Test.list
+
+The separate file contains the five reviewed-source candidate domains. It is not referenced by the V2.5 359-rule production subscription or any automation that updates the phone. **Publishing a GitHub file does not enable it on iPhone.**
+
+### Test order and rollback
+- Before import, keep the existing V2.5 production filter and AI policy choices untouched.
+- Add as a separate filter_remote subscription named `V2.6-CN-Adblock-Test`, initially **disabled**.
+- During a controlled trial, ensure the new adblock resource is evaluated before any overlapping broad domestic DIRECT rule. A `CN` region shortcut may not necessarily be the first matching rule; verify via QX request log, not assumption.
+- Enable the test resource; check a specific target app's opening screen and request log. Record whether the exact host was matched with REJECT and whether app content still loads.
+- Check payment, Apple services, AI login and ordinary domestic apps. Turn the test resource **off immediately** if anything fails.
+- Disable the test resource and repeat the same app action to compare. A successful REJECT hit does not by itself prove a visible ad disappeared.
+- No MitM, scripts, certificates or rewrite modules are needed for this pilot.
+
+### Limits
+Only a handful of specific domestic ad endpoints are targeted. No guarantee of coverage for Douyin, WeChat, Bilibili, Taobao, or any app that uses first-party ad endpoints. Test subscription is manually opt-in and not automatically activated.
