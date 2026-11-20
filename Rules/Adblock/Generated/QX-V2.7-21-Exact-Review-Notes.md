@@ -8,30 +8,38 @@
 
 | Domain | Reason to investigate |
 |---|---|
-| \`ad.linksynergy.com\` | Affiliate tracking and referral redirects may be affected |
-| \`ad.mox.tv\` | Video-platform dependencies not established |
-| \`ad.zijieapi.com\` | Potential domestic app / ByteDance service interactions |
-| \`ads-pixiv.net\` | Pixiv platform behavior not tested |
-| \`ads.nicovideo.jp\` | Niconico platform behavior not tested |
+| `ad.linksynergy.com` | Affiliate tracking and referral redirects may be affected |
+| `ad.mox.tv` | Video-platform dependencies not established |
+| `ad.zijieapi.com` | Potential domestic app / ByteDance service interactions |
+| `ads-pixiv.net` | Pixiv platform behavior not tested |
+| `ads.nicovideo.jp` | Niconico platform behavior not tested |
 
 ## Remaining candidates (16): ordinary audit priority, not approved
 
-- \`ad-back.net\`
-- \`ad-balancer.net\`
-- \`ad-flow.com\`
-- \`ad-maven.com\`
-- \`ad-score.com\`
-- \`ad-server.co.za\`
-- \`ad-srv.net\`
-- \`ad.aloodo.com\`
-- \`ad4m.at\`
-- \`adclick.pk\`
-- \`ads1-adnow.com\`
-- \`ads2ads.net\`
-- \`ads3-adnow.com\`
-- \`ads5-adnow.com\`
-- \`adx1.com\`
-- \`ads.feelingtouch.com\`
+- `ad-back.net`
+- `ad-balancer.net`
+- `ad-flow.com`
+- `ad-maven.com`
+- `ad-score.com`
+- `ad-server.co.za`
+- `ad-srv.net`
+- `ad.aloodo.com`
+- `ad4m.at`
+- `adclick.pk`
+- `ads1-adnow.com`
+- `ads2ads.net`
+- `ads3-adnow.com`
+- `ads5-adnow.com`
+- `adx1.com`
+- `ads.feelingtouch.com`
+
+## Static overlap audit against checked-in baselines (2026-11-20)
+
+- Examined all 21 exact-host candidates against `Rules/Releases/QX-V2.5-359-Rules.list` and `Rules/Adblock/QX-V2.6-CN-Adblock-Test.list` on repository `main`.
+- V2.5 exact-host or covering host-suffix overlaps: **0 / 21**.
+- V2.6 exact-host or covering host-suffix overlaps: **0 / 21**.
+- This is a **static hostname-rule comparison only**. It does not establish absence of broader filter, rewrite, DNS, app-level, or operational conflicts. No app traffic or device testing was performed.
+- **No approval or subscription changes.**
 
 ## Required before a test proposal
 
