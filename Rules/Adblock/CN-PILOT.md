@@ -69,3 +69,10 @@ No REJECT is visible in the screenshot; this does not prove no other REJECT even
 - Existing enabled QX subscription will need a **manual remote resource refresh** to fetch these new lines. GitHub edits alone do not update the local cached copy.
 - To validate: refresh only V2.6 test subscription; reproduce relevant app traffic; verify both exact hosts show REJECT rather than GEOIP CN DIRECT; check map functions and unrelated domestic apps. If an app breaks, disable the test subscription to roll back.
 - Observed traffic and community inclusion support *testing*, not proof that blocking is harmless or removes visible ads.
+
+## Fourth batch: 18:43 real-device log and independent ad-list corroboration
+
+- `adx-data-u1.ubixioe.com`: seen as GEOIP CN DIRECT at 18:43:49. Exact host appears in [DD-AD](https://github.com/afwfv/DD-AD/blob/main/rule/DD-AD.txt) and [AD886](https://github.com/qq5460168/AD886/blob/main/AD.txt). Staged as exact `host` only.
+- `www.qchannel01.cn`: seen as GEOIP CN DIRECT at 18:43:46. Parent domain appears in [NobyDa AdRule](https://github.com/NobyDa/Script/blob/master/Surge/AdRule.list) and [Hackl0us CN-ad](https://github.com/Hackl0us/SS-Rule-Snippet/blob/master/Rulesets/Surge/Custom/CN-ad.list). Staged as exact `host,www.qchannel01.cn,reject`, not suffix.
+- **Nine** total isolated pilot rules. Community listings support a controlled test but do not prove every endpoint is exclusively advertising.
+- After refreshing only the V2.6 test resource, check for new matching REJECT events, not old DIRECT history. Confirm normal Baidu Maps functionality; disable pilot immediately if issues appear.
