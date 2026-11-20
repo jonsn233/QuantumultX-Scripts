@@ -7,6 +7,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / "Rules/Adblock/Generated"
 
+# Explicit service-compatibility review holds. Not an exhaustive safety list.
+COMPATIBILITY_HOLD = {
+    "ad.linksynergy.com", "ad.mox.tv", "ad.zijieapi.com",
+    "ads-pixiv.net", "ads.nicovideo.jp",
+}
+
 def build(base=BASE):
     report = json.loads((base / "QX-CN-Corroboration-Report.json").read_text(encoding="utf-8"))
     tier = json.loads((base / "QX-CN-Tier-Report.json").read_text(encoding="utf-8"))
@@ -32,9 +38,10 @@ def build(base=BASE):
         raise ValueError("Evidence matrix missing A-tier entries")
     output = base / "QX-CN-A-Exact-MultiSource-QUEUE-REVIEW-ONLY.csv"
     chosen = []
+    holds = []
     with output.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["domain", "exact_source_count", "exact_sources", "review_status", "device_test"])
+        w.writerow(["domain", "exact_source_count", "exact_sources", "review_status", "device_test", "compatibility_triage"])
         for domain in sorted(a):
             row = matched[domain]
             count = int(row["exact_source_count"])
@@ -43,9 +50,14 @@ def build(base=BASE):
                 raise ValueError("Inconsistent exact-source evidence")
             if count >= 2:
                 chosen.append(domain)
-                w.writerow([domain, count, row["exact_sources"], "PENDING_REVIEW", "NOT_TESTED"])
+                triage = "EXTRA_SCRUTINY" if domain in COMPATIBILITY_HOLD else "STANDARD_REVIEW"
+                if triage == "EXTRA_SCRUTINY":
+                    holds.append(domain)
+                w.writerow([domain, count, row["exact_sources"], "PENDING_REVIEW", "NOT_TESTED", triage])
     summary = {"status": "review_only", "published": False, "approved": 0,
                "a_tier_count": len(a), "exact_multi_source_queue": len(chosen),
+               "extra_scrutiny_count": len(holds),
+               "standard_review_count": len(chosen) - len(holds),
                "warning": "Exact multi-source inclusion is not safety validation or approval."}
     (base / "QX-CN-A-Exact-MultiSource-QUEUE-Report.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
