@@ -6,3 +6,10 @@
 # Pilot: explicitly ad-named hosts only; do not automatically import other entries.
 host,ad.hori-gz.com,reject
 host,adfile.hori-gz.com,reject
+
+# Source: blackmatrix7/ios_rule_script source/rule/Advertising/Advertising.list
+# Upstream explicitly labels these as startup ad hosts (Baidu Maps, Piaogen, Xiaoxun).
+host,dss0.bdstatic.com,reject
+host-suffix,ads.lejuliang.com,reject
+host,ad.xunkids.com,reject
+# Caiyun weather upstream URL-REGEX requires rewrite-style handling; excluded.
