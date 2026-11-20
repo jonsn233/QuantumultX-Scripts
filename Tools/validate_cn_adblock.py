@@ -57,6 +57,22 @@ else:
     release = RELEASE.read_text(encoding="utf-8")
     if "host-suffix,chatgpt.com,AI-OpenAI" not in release:
         errors.append("V2.5 baseline AI route unexpectedly missing")
+    # Detect potential precedence collisions with existing V2.5 host rules.
+    production = []
+    for raw in release.splitlines():
+        fields = [part.strip().lower() for part in raw.split(",")]
+        if len(fields) >= 3 and fields[0] in ALLOWED:
+            production.append((fields[0], fields[1], fields[2]))
+    for rule in sorted(pilot_rules):
+        fields = rule.split(",")
+        if len(fields) != 3:
+            continue
+        _, domain, _ = fields
+        for kind, target, policy in production:
+            if domain == target or (kind == "host-suffix" and domain.endswith("." + target)):
+                errors.append(
+                    f"pilot domain {domain} overlaps V2.5 {kind} {target} -> {policy}"
+                )
 print(f"Pilot rules: {count}; duplicates: {len(seen) != count}; errors: {len(errors)}")
 for error in errors:
     print("ERROR:", error)
