@@ -1,0 +1,18 @@
+# Quantumult X V2.5 stage 2 — source: supplied V2.4 recovery configuration
+# STAGED ONLY: do not enable alongside local duplicates before migration.
+host-suffix,netflix.com,Media-Netflix
+host-suffix,netflix.net,Media-Netflix
+host-suffix,nflximg.com,Media-Netflix
+host-suffix,nflxvideo.net,Media-Netflix
+host-suffix,nflximg.net,Media-Netflix
+host-suffix,nflxso.net,Media-Netflix
+host-suffix,nflxext.com,Media-Netflix
+host-suffix,nflxsearch.net,Media-Netflix
+host-suffix,disney.com,Media-Disney
+host-suffix,disneyplus.com,Media-Disney
+host-suffix,disney-plus.net,Media-Disney
+host-suffix,bamgrid.com,Media-Disney
+host-suffix,disneyplus.net,Media-Disney
+host-suffix,disneyplus.bn5x.net,Media-Disney
+host-suffix,dssott.com,Media-Disney
+host-suffix,registerdisney.go.com,Media-Disney
