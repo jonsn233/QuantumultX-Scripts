@@ -16,3 +16,4 @@ HOST-SUFFIX,claudeusercontent.com,AI-Claude
 HOST,geminiweb-pa.clients6.google.com,AI-Gemini
 HOST,gemini.google.com,AI-Gemini
 HOST,aistudio.google.com,AI-Gemini
+HOST,generativelanguage.googleapis.com,AI-Gemini
