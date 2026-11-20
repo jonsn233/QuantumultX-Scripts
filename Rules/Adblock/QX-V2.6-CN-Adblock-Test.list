@@ -13,3 +13,7 @@ host,ad.xunkids.com,reject
 # Exact hosts only; no parent suffix expansion.
 host,bj-td-menta-01-callback.advlion.com,reject
 host,s.1rtb.net,reject
+
+# Device-observed 18:43; exact domains independently listed in GitHub ad filters.
+host,adx-data-u1.ubixioe.com,reject
+host,www.qchannel01.cn,reject
