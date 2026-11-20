@@ -10,6 +10,8 @@ on:
       - 'Tools/build_cn_exact_review_queue.py'
       - 'Tools/build_v28_broad_evidence.py'
       - 'Tools/test_build_v28_broad_evidence.py'
+      - 'Tools/build_v28_device_pilot_proposal.py'
+      - 'Tools/test_build_v28_device_pilot_proposal.py'
       - 'Tools/test_build_cn_exact_review_queue.py'
       - 'Tools/test_corroborate_cn_adblock.py'
       - 'Tools/test_classify_cn_adblock_batch.py'
@@ -40,6 +42,8 @@ jobs:
         run: python3 -m unittest discover -s Tools -p "test_build_cn_exact_review_queue.py" -v
       - name: Run V2.8 broad evidence regression tests
         run: python3 -m unittest discover -s Tools -p "test_build_v28_broad_evidence.py" -v
+      - name: Test inactive V2.8 pilot proposal
+        run: python3 -m unittest discover -s Tools -p "test_build_v28_device_pilot_proposal.py" -v
       - name: Build isolated review candidate and provenance report
         run: python3 Tools/build_cn_adblock_batch.py
       - name: Classify all candidate rules against production and pilot
@@ -61,6 +65,8 @@ jobs:
           PY
       - name: Build V2.8 broad evidence inventory (review only)
         run: python3 Tools/build_v28_broad_evidence.py
+      - name: Build inactive V2.8 device pilot proposal
+        run: python3 Tools/build_v28_device_pilot_proposal.py
       - name: Publish review summary to Actions run
         if: success()
         run: |
@@ -152,4 +158,6 @@ jobs:
             Rules/Adblock/Generated/QX-CN-A-Exact-MultiSource-QUEUE-Report.json
             Rules/Adblock/Generated/QX-V2.8-Broad-Evidence-REVIEW-ONLY.csv
             Rules/Adblock/Generated/QX-V2.8-Broad-Evidence-Report.json
+            Rules/Adblock/Generated/QX-V2.8-Device-Pilot-PROPOSAL-NOT-ACTIVE.txt
+            Rules/Adblock/Generated/QX-V2.8-Device-Pilot-PROPOSAL-Report.json
           retention-days: 14
