@@ -6,6 +6,7 @@ on:
       - 'Rules/Adblock/**'
       - 'Tools/audit_adblock_candidate.py'
       - 'Tools/test_audit_adblock_candidate.py'
+      - 'Tools/validate_cn_adblock.py'
       - '.github/workflows/audit-qx-adblock.yml'
   workflow_dispatch:
 permissions:
@@ -23,3 +24,5 @@ jobs:
         run: python3 -m unittest discover -s Tools -p 'test_audit_adblock_candidate.py' -v
       - name: Validate isolated adblock candidate
         run: python3 Tools/audit_adblock_candidate.py
+      - name: Validate enabled CN pilot and protected services
+        run: python3 Tools/validate_cn_adblock.py
