@@ -1,0 +1,52 @@
+name: Publish QX merged candidate (isolated)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-qx-candidate.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: qx-candidate-publish-main
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check existing live rules before staging
+        run: python3 Tools/build_rules.py --check
+      - name: Stage and validate third-party source
+        run: python3 Tools/stage_third_party.py
+      - name: Build isolated combined candidate
+        run: python3 Tools/build_merged_candidate.py
+      - name: Publish candidate only, never live file
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p Rules/Candidates
+          cp Rules/staging/QX-V2.5-Merged-Candidate.list Rules/Candidates/QX-V2.5-Merged-Candidate.list
+          cp Rules/staging/QX-V2.5-Merge-Report.json Rules/Candidates/QX-V2.5-Merge-Report.json
+          if git diff --quiet -- Rules/Candidates; then
+            echo "Candidate unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Rules/Candidates/QX-V2.5-Merged-Candidate.list Rules/Candidates/QX-V2.5-Merge-Report.json
+          git commit -m "Publish isolated QX merged candidate for device testing"
+          git push origin HEAD:main
+      - name: Preserve staging diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qx-merged-candidate-audit
+          path: Rules/staging/
+          if-no-files-found: ignore
