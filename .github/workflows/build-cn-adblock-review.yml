@@ -35,7 +35,7 @@ jobs:
           print("## CN adblock bulk candidate (review only)")
           print()
           print(f"- Candidate rules: **{d['accepted_count']}**")
-          print(f"- Source SHA-256: \`{d['source_sha256']}\`")
+          print(f"- Source SHA-256: {d['source_sha256']}")
           print(f"- Active publication: **{d['active_publish']}**")
           print()
           print("| Audit metric | Count |")
