@@ -1,5 +1,5 @@
 {
-  "name": "QX V2.4 AI & Network Tools",
+  "name": "QX V2.5 AI & Network Tools",
   "task": [
     {
       "config": "event-interaction https://raw.githubusercontent.com/jonsn233/QuantumultX-Scripts/main/Scripts/Network/QX_OneTap_Site_Check_v1.js, tag=国内国外一键检测, enabled=true"
@@ -9,7 +9,10 @@
     },
     {
       "config": "event-interaction https://raw.githubusercontent.com/CC13594759/QuantumultX/main/IPPure.js, tag=IP纯净度检测, enabled=true"
+    },
+    {
+      "config": "event-interaction https://raw.githubusercontent.com/jonsn233/QuantumultX-Scripts/main/Scripts/Network/QX_V2.5_Routing_Acceptance_v1.js, tag=V2.5分流验收, enabled=true"
     }
   ],
-  "description": "QX V2.4 task gallery. Script URLs are stable and can be updated at their upstream paths. Import only missing tasks; avoid duplicates. Claude v19 requires selecting a node; no MITM credentials."
+  "description": "QX V2.5 task gallery. Existing tasks preserved; new read-only routing acceptance checks HTTP reachability and one observed IP, not actual per-app policy hits. No MITM or config changes. Avoid duplicate imports."
 }
