@@ -8,6 +8,7 @@ on:
       - 'Tools/classify_cn_adblock_batch.py'
       - 'Tools/corroborate_cn_adblock.py'
       - 'Tools/build_cn_exact_review_queue.py'
+      - 'Tools/build_v28_broad_evidence.py'
       - 'Tools/test_build_cn_exact_review_queue.py'
       - 'Tools/test_corroborate_cn_adblock.py'
       - 'Tools/test_classify_cn_adblock_batch.py'
@@ -55,6 +56,8 @@ jobs:
           else:
               print('Partial sources: no exact multi-source queue generated')
           PY
+      - name: Build V2.8 broad evidence inventory (review only)
+        run: python3 Tools/build_v28_broad_evidence.py
       - name: Publish review summary to Actions run
         if: success()
         run: |
@@ -101,6 +104,10 @@ jobs:
               print("- A-tier exact two-source review queue: NOT GENERATED (partial sources)")
           print("- All matched domains remain unapproved and not device-tested.")
           print()
+          broad = json.loads(Path("Rules/Adblock/Generated/QX-V2.8-Broad-Evidence-Report.json").read_text(encoding="utf-8"))
+          print("### V2.8 broad evidence (never auto-publish)")
+          for name, count in broad["buckets"].items():
+              print(f"- {name}: **{count}**")
           print("### First 20 A-tier candidates (review only)")
           print("| Rule | Host |")
           print("|---|---|")
@@ -140,4 +147,6 @@ jobs:
             Rules/Adblock/Generated/QX-CN-Corroboration-Report.json
             Rules/Adblock/Generated/QX-CN-A-Exact-MultiSource-QUEUE-REVIEW-ONLY.csv
             Rules/Adblock/Generated/QX-CN-A-Exact-MultiSource-QUEUE-Report.json
+            Rules/Adblock/Generated/QX-V2.8-Broad-Evidence-REVIEW-ONLY.csv
+            Rules/Adblock/Generated/QX-V2.8-Broad-Evidence-Report.json
           retention-days: 14
