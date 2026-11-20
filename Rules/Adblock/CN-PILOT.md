@@ -19,3 +19,13 @@ Goal: prioritize mainland Chinese app advertising while protecting normal DIRECT
 
 ## Source strategy
 The large upstream AdvertisingLite (38,066) and Advertising (291,159) rule sets are not imported. Future additions must cite exact upstream lines, keep domain-only matching, and be reviewed in small batches. Domain-blocking cannot reliably remove first-party or in-feed advertising that shares an application's normal API hosts.
+
+## Second batch: documented domestic app startup-ad hosts (2026-11-20)
+Exact upstream: https://github.com/blackmatrix7/ios_rule_script/blob/master/source/rule/Advertising/Advertising.list
+
+- `DOMAIN,dss0.bdstatic.com,REJECT` — upstream comment: 百度地图开屏广告; staged as `host,dss0.bdstatic.com,reject`.
+- `DOMAIN-SUFFIX,ads.lejuliang.com,REJECT` — upstream comment: 票根启动广告; staged as `host-suffix,ads.lejuliang.com,reject`.
+- `DOMAIN,ad.xunkids.com,REJECT` — upstream comment: 小寻儿童电话手表 app 启动广告; staged as `host,ad.xunkids.com,reject`.
+- `URL-REGEX,^https?...cdn-1rtb.caiyunapp.com/creative/...,REJECT` — upstream comment: 彩云天气开屏广告; **not imported**, because this pilot permits domain rules only and does not authorize URL rewrite or MitM.
+
+Five total staged domains; none enabled. Upstream labeling is not device proof. Baidu's `bdstatic.com` is a shared parent; only exact `dss0.bdstatic.com` is eligible, never the entire suffix.
