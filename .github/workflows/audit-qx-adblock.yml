@@ -5,6 +5,7 @@ on:
     paths:
       - 'Rules/Adblock/**'
       - 'Tools/audit_adblock_candidate.py'
+      - 'Tools/test_audit_adblock_candidate.py'
       - '.github/workflows/audit-qx-adblock.yml'
   workflow_dispatch:
 permissions:
@@ -18,5 +19,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Test safety gate against regression cases
+        run: python3 -m unittest discover -s Tools -p 'test_audit_adblock_candidate.py' -v
       - name: Validate isolated adblock candidate
         run: python3 Tools/audit_adblock_candidate.py
