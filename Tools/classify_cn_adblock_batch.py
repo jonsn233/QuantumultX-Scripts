@@ -64,6 +64,13 @@ def main():
     tiers, reasons = classify(candidates, production, pilot)
     if sum(map(len, tiers.values())) != len(candidates):
         raise SystemExit("Classification count mismatch")
+    # Limit the first manual review to a deterministic, bounded subset.
+    # This is NOT a phone subscription and is NOT an approval.
+    shortlist = sorted(tiers["A"], key=lambda x: (x[1], x[0]))[:100]
+    (BASE / "QX-CN-Tier-A-First100-REVIEW-ONLY.list").write_text(
+        "# FIRST 100 FOR MANUAL REVIEW ONLY - NOT APPROVED OR DEVICE TESTED\n"
+        + "".join(f"{k},{d},{p}\\n" for k, d, p in shortlist),
+        encoding="utf-8")
     for tier, rules in tiers.items():
         (BASE / f"QX-CN-Tier-{tier}-REVIEW-ONLY.list").write_text(
             "# NOT APPROVED, NOT DEVICE TESTED, DO NOT SUBSCRIBE\n"
@@ -72,6 +79,7 @@ def main():
     report = {"status": "review_only", "published": False,
               "candidate_total": len(candidates),
               "tiers": {key: len(value) for key, value in tiers.items()},
+              "tier_A_first_review_count": len(shortlist),
               "reasons": reasons,
               "tier_A_warning": "Lexical ad label is not proof of safe blocking.",
               "tier_C_warning": "Overlaps existing V2.5 routing or V2.6 pilot; not approved."}
