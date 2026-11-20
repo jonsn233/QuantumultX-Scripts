@@ -13,3 +13,8 @@ host,dss0.bdstatic.com,reject
 host-suffix,ads.lejuliang.com,reject
 host,ad.xunkids.com,reject
 # Caiyun weather upstream URL-REGEX requires rewrite-style handling; excluded.
+
+# Device-observed 2026-11-20; independently listed in AWAvenue ad filters.
+# Exact hosts only; no parent suffix expansion.
+host,bj-td-menta-01-callback.advlion.com,reject
+host,s.1rtb.net,reject
