@@ -1,5 +1,10 @@
 name: Audit third-party Quantumult X rules (staging)
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'Tools/stage_third_party.py'
+      - '.github/workflows/audit-qx-third-party.yml'
   workflow_dispatch:
 permissions:
   contents: read
