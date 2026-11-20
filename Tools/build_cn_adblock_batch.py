@@ -54,8 +54,9 @@ def parse(raw):
         if len(fields) < 2 or fields[0] not in ("host", "host-suffix", "domain", "domain-suffix"):
             counts["unsupported"] += 1
             continue
+        # Only the configured AdvertisingLite list label is allowed alongside REJECT.
         # Never convert an upstream DIRECT/PROXY policy into a REJECT.
-        if len(fields) > 2 and fields[2] not in ("reject", "reject-drop", "reject-200"):
+        if len(fields) > 2 and fields[2] not in ("reject", "reject-drop", "reject-200", "advertisinglite"):
             counts["non_reject"] += 1
             continue
         kind = "host-suffix" if fields[0] in ("host-suffix", "domain-suffix") else "host"
