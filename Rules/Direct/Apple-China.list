@@ -1,0 +1,23 @@
+# Quantumult X V2.5 stage 2 — source: supplied V2.4 recovery configuration
+# STAGED ONLY: do not enable alongside local duplicates before migration.
+host-suffix,apple.com,direct
+host-suffix,icloud.com,direct
+host-suffix,apple-dns.net,direct
+host-suffix,mzstatic.com,direct
+host-suffix,qq.com,direct
+host-suffix,weixin.qq.com,direct
+host-suffix,wechat.com,direct
+host-suffix,alipay.com,direct
+host-suffix,taobao.com,direct
+host-suffix,tmall.com,direct
+host-suffix,jd.com,direct
+host-suffix,bilibili.com,direct
+host-suffix,bilivideo.com,direct
+host-suffix,baidu.com,direct
+host-suffix,douyin.com,direct
+host-suffix,bytedance.com,direct
+host-suffix,163.com,direct
+host-suffix,126.com,direct
+host-suffix,meituan.com,direct
+host-suffix,dianping.com,direct
+host-suffix,xiaohongshu.com,direct
