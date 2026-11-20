@@ -24,6 +24,16 @@ class TierTests(unittest.TestCase):
         self.assertEqual(len(tiers["C"]), 1)
         self.assertEqual(reasons["pilot_overlap"], 1)
 
+    def test_sensitive_first_party_and_short_domains_not_fast_tracked(self):
+        domains = ["adclick.tencentmusic.com", "ad.wx.com",
+                   "ad.mcloud.139.com", "ads-img-qc.xhscdn.com",
+                   "ad.gt", "ad.style"]
+        rules = [("host", d, "reject") for d in domains]
+        tiers, reasons = classify(rules, [], [])
+        self.assertEqual(len(tiers["A"]), 0)
+        self.assertEqual(len(tiers["B"]), len(domains))
+        self.assertEqual(reasons["sensitive_or_ambiguous"], len(domains))
+
     def test_suffix_and_ambiguous_host_stay_b(self):
         rules = [("host-suffix", "ads.example.com", "reject"),
                  ("host", "cdn.example.com", "reject"),
