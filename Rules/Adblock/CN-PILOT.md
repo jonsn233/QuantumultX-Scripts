@@ -47,3 +47,16 @@ The separate file contains the five reviewed-source candidate domains. It is not
 
 ### Limits
 Only a handful of specific domestic ad endpoints are targeted. No guarantee of coverage for Douyin, WeChat, Bilibili, Taobao, or any app that uses first-party ad endpoints. Test subscription is manually opt-in and not automatically activated.
+
+## Real device evidence — 2026-11-20 18:34 (user screenshot)
+
+Quantumult X network activity while using Baidu Maps:
+- `bj-td-menta-01-callback.advlion.com:443`: GEOIP,CN,DIRECT; possible advertising callback, **not verified safe to block**.
+- `s.1rtb.net:443`: GEOIP,CN,DIRECT; possible real-time bidding endpoint, **not verified safe to block**.
+- `open.e.kuaishou.com:443`: GEOIP,CN,DIRECT; ambiguous shared app/SDK endpoint, **do not block by inference**.
+- `cnloc.map.baidu.com:443`: HOST-SUFFIX,BAIDU.COM,DIRECT; location service, preserve.
+- `gateway.icloud.com.cn:443`: GEOIP,CN,DIRECT; Apple service, preserve.
+
+No REJECT is visible in the screenshot; this does not prove no other REJECT events occurred. Previously searched `dss0.bdstatic.com` had no records. Current five-rule pilot does not cover the two observed ad-related candidate domains.
+
+**Decision:** keep current production and five-rule test resource unchanged. Do not block `advlion.com` or `1rtb.net` at parent-domain level based solely on names. Verify endpoint role, exact-match scope, and A/B test effect before introducing a separately reviewed change. In particular, retain existing DIRECT for `cnloc.map.baidu.com` and Apple.
