@@ -7,6 +7,7 @@ on:
       - 'Tools/test_build_cn_adblock_batch.py'
       - 'Tools/classify_cn_adblock_batch.py'
       - 'Tools/corroborate_cn_adblock.py'
+      - 'Tools/build_cn_exact_review_queue.py'
       - 'Tools/test_corroborate_cn_adblock.py'
       - 'Tools/test_classify_cn_adblock_batch.py'
       - 'Rules/Releases/QX-V2.5-359-Rules.list'
@@ -38,6 +39,19 @@ jobs:
         run: python3 Tools/classify_cn_adblock_batch.py
       - name: Corroborate all candidates against independent lists (review only)
         run: python3 Tools/corroborate_cn_adblock.py
+      - name: Build exact multi-source A-tier review queue when sources are complete
+        if: success()
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('Rules/Adblock/Generated/QX-CN-Corroboration-Report.json').read_text())
+          if report['source_completeness'] == 'complete':
+              import subprocess
+              subprocess.run(['python3', 'Tools/build_cn_exact_review_queue.py'], check=True)
+          else:
+              print('Partial sources: no exact multi-source queue generated')
+          PY
       - name: Publish review summary to Actions run
         if: success()
         run: |
@@ -72,6 +86,14 @@ jobs:
           for label, count in corroboration["match_buckets"].items():
               print(f"- {label} source matches: {count}")
           print(f"- Source failures: {corroboration['source_errors']}")
+          for label, count in corroboration["exact_match_buckets"].items():
+              print(f"- {label} **exact** source matches: {count}")
+          queue = Path("Rules/Adblock/Generated/QX-CN-A-Exact-MultiSource-QUEUE-Report.json")
+          if queue.exists():
+              q = json.loads(queue.read_text(encoding="utf-8"))
+              print(f"- A-tier exact two-source review queue: **{q['exact_multi_source_queue']}** (NOT approved)")
+          else:
+              print("- A-tier exact two-source review queue: NOT GENERATED (partial sources)")
           print("- All matched domains remain unapproved and not device-tested.")
           print()
           print("### First 20 A-tier candidates (review only)")
@@ -111,4 +133,6 @@ jobs:
             Rules/Adblock/Generated/QX-CN-Tier-Report.json
             Rules/Adblock/Generated/QX-CN-All-Candidates-Corroboration-REVIEW-ONLY.csv
             Rules/Adblock/Generated/QX-CN-Corroboration-Report.json
+            Rules/Adblock/Generated/QX-CN-A-Exact-MultiSource-QUEUE-REVIEW-ONLY.csv
+            Rules/Adblock/Generated/QX-CN-A-Exact-MultiSource-QUEUE-Report.json
           retention-days: 14
