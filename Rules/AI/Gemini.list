@@ -1,6 +1,6 @@
 # Quantumult X V2.5 staged rules — AI-Gemini
-# Publish only; do not enable until local duplicate rules are reconciled.
-HOST,geminiweb-pa.clients6.google.com
-HOST,gemini.google.com
-HOST,aistudio.google.com
+# Remote rules; policy is explicitly included for Quantumult X parser compatibility.
+HOST,geminiweb-pa.clients6.google.com,AI-Gemini
+HOST,gemini.google.com,AI-Gemini
+HOST,aistudio.google.com,AI-Gemini
 HOST,generativelanguage.googleapis.com,AI-Gemini
