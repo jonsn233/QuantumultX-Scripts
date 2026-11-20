@@ -66,6 +66,9 @@ jobs:
           corroboration = json.loads(Path("Rules/Adblock/Generated/QX-CN-Corroboration-Report.json").read_text(encoding="utf-8"))
           print("### Full-batch independent list corroboration (not approval)")
           print(f"- Successfully fetched sources: {corroboration['source_count']}")
+          print(f"- Source completeness: **{corroboration['source_completeness']}**")
+          for name, digest in corroboration["source_sha256"].items():
+              print(f"- {name} SHA-256: `{digest}`")
           for label, count in corroboration["match_buckets"].items():
               print(f"- {label} source matches: {count}")
           print(f"- Source failures: {corroboration['source_errors']}")
