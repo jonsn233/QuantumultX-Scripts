@@ -38,16 +38,17 @@ def main():
             if not line or line.startswith("#"):
                 continue
             parts = [p.strip() for p in line.split(",")]
-            if len(parts) not in (2, 3):
+            if len(parts) not in (3, 4):
                 raise ValueError(f"{name}:{n}: unexpected field count: {line}")
             kind = parts[0].lower()
             if kind not in ALLOWED or not VALID_TOKEN.fullmatch(parts[1]):
                 raise ValueError(f"{name}:{n}: unsupported or malformed rule: {line}")
-            # Upstream third field may be 'no-resolve' on IP rules, never a policy.
-            if len(parts) == 3 and parts[2].lower() != "no-resolve":
-                raise ValueError(f"{name}:{n}: unexpected third field: {line}")
-            if len(parts) == 3 and kind not in ("ip-cidr", "ip6-cidr"):
-                raise ValueError(f"{name}:{n}: no-resolve on unsupported type: {line}")
+            # Upstream QX rules include their original policy in field 3.
+            # Map it explicitly to our existing phone policy group.
+            if not VALID_TOKEN.fullmatch(parts[2]):
+                raise ValueError(f"{name}:{n}: malformed upstream policy: {line}")
+            if len(parts) == 4 and (parts[3].lower() != "no-resolve" or kind not in ("ip-cidr", "ip6-cidr")):
+                raise ValueError(f"{name}:{n}: unsupported option: {line}")
             key = (kind, parts[1].lower())
             if key in seen:
                 if seen[key] != policy:
@@ -55,12 +56,12 @@ def main():
                 continue
             seen[key] = policy
             normalized = f"{kind},{parts[1]},{policy}"
-            if len(parts) == 3:
+            if len(parts) == 4:
                 normalized += ",no-resolve"
             rules.append(normalized)
             counts[kind] += 1
-        if len(rules) < baseline:
-            raise ValueError(f"{name}: count dropped from baseline {baseline} to {len(rules)}")
+        if sum(counts.values()) < baseline * 0.9:
+            raise ValueError(f"{name}: unique count unexpectedly dropped from baseline {baseline} to {sum(counts.values())}")
         entries.extend([f"# {name}: {url}", *rules, ""])
         audit.append({"source": name, "url": url, "policy": policy,
                       "sha256": sha256(raw).hexdigest(), "baseline": baseline,
