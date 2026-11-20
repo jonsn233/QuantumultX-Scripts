@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Risk-tier bulk adblock candidates. Review artifacts only, never live subscriptions."""
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -66,7 +67,11 @@ def main():
         raise SystemExit("Classification count mismatch")
     # Limit the first manual review to a deterministic, bounded subset.
     # This is NOT a phone subscription and is NOT an approval.
-    shortlist = sorted(tiers["A"], key=lambda x: (x[1], x[0]))[:100]
+    # Stable hash ordering samples across the whole A tier instead of
+    # over-representing alphabetically early domains.
+    shortlist = sorted(tiers["A"], key=lambda x: (
+        hashlib.sha256((x[0] + "," + x[1]).encode("utf-8")).hexdigest(), x[1]
+    ))[:100]
     (BASE / "QX-CN-Tier-A-First100-REVIEW-ONLY.list").write_text(
         "# FIRST 100 FOR MANUAL REVIEW ONLY - NOT APPROVED OR DEVICE TESTED\n"
         + "".join(f"{k},{d},{p}\n" for k, d, p in shortlist),
@@ -80,6 +85,7 @@ def main():
               "candidate_total": len(candidates),
               "tiers": {key: len(value) for key, value in tiers.items()},
               "tier_A_first_review_count": len(shortlist),
+              "first_review_selection": "sha256-ranked deterministic sample across A tier",
               "reasons": reasons,
               "tier_A_warning": "Lexical ad label is not proof of safe blocking.",
               "tier_C_warning": "Overlaps existing V2.5 routing or V2.6 pilot; not approved."}
