@@ -1,5 +1,11 @@
 name: Build CN adblock review batch (never auto-publish)
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'Tools/build_cn_adblock_batch.py'
+      - 'Tools/test_build_cn_adblock_batch.py'
+      - '.github/workflows/build-cn-adblock-review.yml'
   workflow_dispatch:
   schedule:
     - cron: '15 4 * * 1'
