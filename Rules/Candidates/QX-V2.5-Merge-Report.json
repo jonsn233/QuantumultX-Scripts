@@ -1,0 +1,17 @@
+{
+  "base": 108,
+  "upstream": 267,
+  "duplicates_removed": 16,
+  "combined": 359,
+  "by_type": {
+    "host-suffix": 319,
+    "host": 9,
+    "host-wildcard": 3,
+    "host-keyword": 3,
+    "user-agent": 7,
+    "ip-cidr": 8,
+    "ip6-cidr": 5,
+    "ip-asn": 5
+  },
+  "status": "staging_only_not_device_validated"
+}
