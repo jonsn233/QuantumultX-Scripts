@@ -5,11 +5,12 @@
  */
 (function () {
   "use strict";
-  var VERSION = "19.0.0";
+  var VERSION = "19.1.0";
   var TIMEOUT_MS = 6500;
   var HISTORY_LIMIT = 30;
   var A = "https://api.ipify.org?format=json";
   var B = "https://ipv4.icanhazip.com/";
+  var C = "https://api4.ipify.org/";
   var GEO = "https://ipwho.is/";
   var GEO_BACKUP = "https://ipapi.co/";
   var REP_OK_TTL = 6 * 60 * 60 * 1000;
@@ -268,32 +269,43 @@
     return;
   }
   Promise.all([get(A,tag,parseEcho),get(B,tag,parseEcho)]).then(function (pair) {
-    var a=pair[0],b=pair[1],agreed=a.ok && b.ok && a.data===b.data;
-    var ip=agreed ? a.data : null;
-    var h=agreed ? history(tag,ip) : null;
-    var geo=agreed ? geoWithFallback(ip,tag) :
-      Promise.resolve({ok:false,status:"skipped",error:"双源未一致，跳过归属查询"});
-    var rep = agreed ? collectRep(ip,tag) : Promise.resolve(null);
-    return Promise.all([geo,rep]).then(function(results) {
-      var g=results[0], reputation=results[1];
-      var lines=[
-        "节点："+brief(tag,64),
-        "出口："+(ip || "未确认"),
-        "双源："+(agreed ? "一致" : "未确认"),
-        "归属："+(g.ok ? [g.data.country,g.data.region].filter(Boolean).join(" / ") : "未知"),
-        "历史："+(h ? (h.saved ? "已保存，累计"+h.state.count+"次，变化"+h.state.changes+"次" : "保存失败") : "未保存"),
-        "信誉数据："+(reputation ? REP_SOURCES.filter(function(k){return reputation[k].status==="ok";}).length+"/4 家可用" : "未查询"),
-        "耗时："+(Date.now()-start)+"ms"
-      ];
-      if (!agreed) {
-        lines.push("ipify："+brief(a.ok?a.data:a.error,80));
-        lines.push("icanhazip："+brief(b.ok?b.data:b.error,80));
-      }
-      if (g.ok && g.data.source==="ipapi.co") lines.push("归属：备用来源");
-      lines.push("注：信誉数据≠Claude封号风险");
-      lines.push("版本："+VERSION);
-      var summary=lines.join("\n");
-      finish("Claude IP Guard · 节点出口",summary);
+    var a=pair[0], b=pair[1];
+    var agreed=a.ok && b.ok && a.data===b.data;
+    // A third endpoint is diagnostic only. Two-of-three is not proof of a fixed exit.
+    var third=agreed ? Promise.resolve(null) : get(C,tag,parseEcho);
+    return third.then(function(c) {
+      var ip=agreed ? a.data : null;
+      var h=agreed ? history(tag,ip) : null;
+      var geo=agreed ? geoWithFallback(ip,tag) :
+        Promise.resolve({ok:false,status:"skipped",error:"出口未确认，跳过归属查询"});
+      var rep=agreed ? collectRep(ip,tag) : Promise.resolve(null);
+      return Promise.all([geo,rep]).then(function(results) {
+        var g=results[0], reputation=results[1];
+        var lines=[
+          "节点："+brief(tag,64),
+          "出口："+(ip || "未确认"),
+          "双源："+(agreed ? "一致" : "不一致或检测失败"),
+          "归属："+(g.ok ? [g.data.country,g.data.region].filter(Boolean).join(" / ") : "未知"),
+          "历史："+(h ? (h.saved ? "已保存，累计"+h.state.count+"次，变化"+h.state.changes+"次" : "保存失败") : "未保存"),
+          "信誉数据："+(reputation ? REP_SOURCES.filter(function(k){return reputation[k].status==="ok";}).length+"/4 家可用" : "未查询"),
+          "耗时："+(Date.now()-start)+"ms"
+        ];
+        if (!agreed) {
+          lines.push("ipify："+brief(a.ok?a.data:a.error,80));
+          lines.push("icanhazip："+brief(b.ok?b.data:b.error,80));
+          lines.push("第三源："+brief(c && c.ok?c.data:(c?c.error:"未运行"),80));
+          var valid=[a,b,c].filter(function(x){return x && x.ok;}).map(function(x){return x.data;});
+          var distinct=valid.filter(function(v,i){return valid.indexOf(v)===i;});
+          if (distinct.length>1) lines.push("诊断：多个出口IP；可能为出口池/轮换，未证实原因");
+          else if (valid.length<2) lines.push("诊断：检测源失败或不足，无法判断出口");
+          else lines.push("诊断：检测源结果不完整，暂不确认固定出口");
+          lines.push("建议：核对节点出口配置；勿将多数结果当作固定IP");
+        }
+        if (g.ok && g.data.source==="ipapi.co") lines.push("归属：备用来源");
+        lines.push("注：信誉数据≠Claude封号风险");
+        lines.push("版本："+VERSION);
+        finish("Claude IP Guard · 节点出口",lines.join("\n"));
+      });
     });
   }).catch(function(err){
     finish("检测异常",text(err && err.message || "未知异常"));
