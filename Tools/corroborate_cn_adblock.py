@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Independent-source corroboration, review-only. No publication or approvals."""
-import re
+import hashlib
 import json
 import urllib.request
 from pathlib import Path
@@ -57,6 +57,7 @@ def main():
     if len(candidates) < 1000:
         raise SystemExit("Candidate input unexpectedly small")
     source_data = {}
+    source_hashes = {}
     errors = {}
     for name, url in SOURCES.items():
         try:
@@ -69,6 +70,7 @@ def main():
             if len(domains) < 1000:
                 raise ValueError("source unexpectedly small")
             source_data[name] = domains
+            source_hashes[name] = hashlib.sha256(raw).hexdigest()
         except Exception as exc:
             errors[name] = str(exc)[:200]
     # No sources: fail closed rather than producing false zero-evidence labels.
@@ -89,8 +91,11 @@ def main():
         "status": "review_only", "approved": 0, "published": False,
         "candidate_total": len(candidates), "source_count": len(source_data),
         "source_sizes": {k: len(v) for k, v in source_data.items()},
+        "source_sha256": source_hashes,
+        "source_urls": {name: SOURCES[name] for name in source_data},
+        "source_completeness": "complete" if len(source_data) == len(SOURCES) else "partial",
         "source_errors": errors, "match_buckets": buckets,
-        "limitations": "Shared upstream provenance is possible. Matches are not independent proof of safe blocking; suffix matching may overstate evidence. No device tests."
+        "limitations": "Source outages make match counts incomparable across runs. Shared upstream provenance is possible. Matches are not independent proof of safe blocking; suffix matching may overstate evidence. No device tests."
     }
     (OUT / "QX-CN-Corroboration-Report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report))
