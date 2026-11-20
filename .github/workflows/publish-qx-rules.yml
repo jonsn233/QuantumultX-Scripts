@@ -14,6 +14,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    concurrency:
+      group: qx-rules-publish-main
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,13 +27,18 @@ jobs:
       - name: Validate and build
         run: python3 Tools/build_rules.py
       - name: Commit only when changed
+        shell: bash
         run: |
+          set -euo pipefail
           if git diff --quiet -- Rules/QX-V2.5-All-Rules.list; then
-            echo "No changes"
+            echo "No bundle changes"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Rules/QX-V2.5-All-Rules.list
           git commit -m "Auto-publish Quantumult X consolidated rules"
-          git push
+          if ! git push origin HEAD:main; then
+            echo "::error::Bundle push failed. Check Actions workflow token write permission, branch protection, or concurrent main updates."
+            exit 1
+          fi
