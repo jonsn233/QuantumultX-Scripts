@@ -1,0 +1,36 @@
+name: Publish Quantumult X rules
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Rules/AI/**'
+      - 'Rules/Media/**'
+      - 'Rules/International/**'
+      - 'Rules/Direct/**'
+      - 'Tools/build_rules.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate and build
+        run: python3 Tools/build_rules.py
+      - name: Commit only when changed
+        run: |
+          if git diff --quiet -- Rules/QX-V2.5-All-Rules.list; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Rules/QX-V2.5-All-Rules.list
+          git commit -m "Auto-publish Quantumult X consolidated rules"
+          git push
