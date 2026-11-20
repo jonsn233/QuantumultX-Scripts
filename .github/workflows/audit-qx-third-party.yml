@@ -1,0 +1,24 @@
+name: Audit third-party Quantumult X rules (staging)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download, normalize and audit upstream rules
+        run: python3 Tools/stage_third_party.py
+      - name: Upload staging artifacts only
+        uses: actions/upload-artifact@v4
+        with:
+          name: qx-third-party-staging
+          path: |
+            Rules/staging/QX-Third-Party-Candidate.list
+            Rules/staging/QX-Third-Party-Audit.json
+          if-no-files-found: error
