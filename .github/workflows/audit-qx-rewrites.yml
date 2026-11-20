@@ -5,6 +5,7 @@ on:
     paths:
       - 'Rewrites/**'
       - 'Tools/audit_rewrites.py'
+      - 'Tools/test_audit_rewrites.py'
       - '.github/workflows/audit-qx-rewrites.yml'
   workflow_dispatch:
 permissions:
@@ -18,5 +19,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Run safety-gate regression tests
+        run: python3 -m unittest discover -s Tools -p 'test_audit_rewrites.py' -v
       - name: Block unreviewed active rewrite directives
         run: python3 Tools/audit_rewrites.py
