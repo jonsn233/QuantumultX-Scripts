@@ -1,0 +1,26 @@
+name: Build CN adblock review batch (never auto-publish)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 4 * * 1'
+permissions:
+  contents: read
+jobs:
+  review-batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build isolated review candidate and provenance report
+        run: python3 Tools/build_cn_adblock_batch.py
+      - name: Upload review-only outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: qx-cn-adblock-review
+          path: |
+            Rules/Adblock/Generated/QX-CN-Adblock-Bulk-REVIEW-ONLY.list
+            Rules/Adblock/Generated/QX-CN-Adblock-Bulk-Report.json
+          retention-days: 14
