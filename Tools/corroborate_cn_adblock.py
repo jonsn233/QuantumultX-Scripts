@@ -46,9 +46,17 @@ def read_candidates(path):
             rules.append((parts[0], parts[1]))
     return rules
 
-def covered(domain, source_domains):
+def match_type(domain, source_domains):
+    """Keep exact domain matches separate from weaker parent-domain coverage."""
+    if domain in source_domains:
+        return "exact"
     labels = domain.split(".")
-    return any(".".join(labels[i:]) in source_domains for i in range(len(labels)-1))
+    if any(".".join(labels[i:]) in source_domains for i in range(1, len(labels)-1)):
+        return "parent"
+    return "none"
+
+def covered(domain, source_domains):
+    return match_type(domain, source_domains) != "none"
 
 def main():
     if not CANDIDATES.exists():
@@ -79,14 +87,21 @@ def main():
     import csv
     dest = OUT / "QX-CN-All-Candidates-Corroboration-REVIEW-ONLY.csv"
     buckets = {"zero": 0, "one": 0, "multiple": 0}
+    exact_buckets = {"zero": 0, "one": 0, "multiple": 0}
     with dest.open("w", encoding="utf-8", newline="") as fp:
         w = csv.writer(fp)
         w.writerow(["kind", "domain", "matched_source_count", "matched_sources",
+                    "exact_source_count", "exact_sources", "parent_coverage_sources",
                     "review_status", "device_test"])
         for kind, domain in sorted(candidates):
-            hits = [name for name, domains in source_data.items() if covered(domain, domains)]
+            matches = {name: match_type(domain, domains) for name, domains in source_data.items()}
+            hits = [name for name, typ in matches.items() if typ != "none"]
+            exact = [name for name, typ in matches.items() if typ == "exact"]
+            parent = [name for name, typ in matches.items() if typ == "parent"]
             buckets["zero" if not hits else "one" if len(hits) == 1 else "multiple"] += 1
-            w.writerow([kind, domain, len(hits), ";".join(hits), "UNAPPROVED", "NOT_TESTED"])
+            exact_buckets["zero" if not exact else "one" if len(exact) == 1 else "multiple"] += 1
+            w.writerow([kind, domain, len(hits), ";".join(hits), len(exact),
+                        ";".join(exact), ";".join(parent), "UNAPPROVED", "NOT_TESTED"])
     report = {
         "status": "review_only", "approved": 0, "published": False,
         "candidate_total": len(candidates), "source_count": len(source_data),
@@ -95,6 +110,7 @@ def main():
         "source_urls": {name: SOURCES[name] for name in source_data},
         "source_completeness": "complete" if len(source_data) == len(SOURCES) else "partial",
         "source_errors": errors, "match_buckets": buckets,
+        "exact_match_buckets": exact_buckets,
         "limitations": "Source outages make match counts incomparable across runs. Shared upstream provenance is possible. Matches are not independent proof of safe blocking; suffix matching may overstate evidence. No device tests."
     }
     (OUT / "QX-CN-Corroboration-Report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
