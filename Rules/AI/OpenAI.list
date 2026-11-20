@@ -1,9 +1,9 @@
 # Quantumult X V2.5 staged rules — AI-OpenAI
-# Remote rules; policy is explicitly included for Quantumult X parser compatibility.
-HOST-SUFFIX,chatgpt.com,AI-OpenAI
-HOST-SUFFIX,openai.com,AI-OpenAI
-HOST-SUFFIX,oaistatic.com,AI-OpenAI
-HOST-SUFFIX,openaiapi-site.azureedge.net,AI-OpenAI
-HOST-SUFFIX,chatgptusercontent.com,AI-OpenAI
-HOST-SUFFIX,oaiusercontent.com,AI-OpenAI
-HOST-SUFFIX,auth.openai.com,AI-OpenAI
+# Quantumult X native lowercase rule types, with explicit policy.
+host-suffix,chatgpt.com,AI-OpenAI
+host-suffix,openai.com,AI-OpenAI
+host-suffix,oaistatic.com,AI-OpenAI
+host-suffix,openaiapi-site.azureedge.net,AI-OpenAI
+host-suffix,chatgptusercontent.com,AI-OpenAI
+host-suffix,oaiusercontent.com,AI-OpenAI
+host-suffix,auth.openai.com,AI-OpenAI
