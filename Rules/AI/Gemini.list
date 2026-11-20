@@ -1,6 +1,6 @@
 # Quantumult X V2.5 staged rules — AI-Gemini
-# Remote rules; policy is explicitly included for Quantumult X parser compatibility.
-HOST,geminiweb-pa.clients6.google.com,AI-Gemini
-HOST,gemini.google.com,AI-Gemini
-HOST,aistudio.google.com,AI-Gemini
-HOST,generativelanguage.googleapis.com,AI-Gemini
+# Quantumult X native lowercase rule types, with explicit policy.
+host,geminiweb-pa.clients6.google.com,AI-Gemini
+host,gemini.google.com,AI-Gemini
+host,aistudio.google.com,AI-Gemini
+host,generativelanguage.googleapis.com,AI-Gemini
