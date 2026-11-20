@@ -82,7 +82,13 @@ def main():
     raw = args.offline.read_bytes() if args.offline else fetch(next(iter(SOURCES.values())), args.max_bytes)
     if len(raw) > args.max_bytes:
         raise ValueError("input exceeds byte cap")
+    # Refuse unexpected upstream format or a silent upstream truncation.
+    header = raw[:4096].decode("utf-8-sig", errors="replace")
+    if not args.offline and "# NAME: AdvertisingLite" not in header:
+        raise ValueError("unexpected upstream identity: AdvertisingLite header missing")
     rules, counts = parse(raw)
+    if not args.offline and counts["input_lines"] < 10000:
+        raise ValueError("upstream unexpectedly short; refusing candidate artifact")
     if not rules:
         raise ValueError("zero usable candidate rules; refusing empty artifact")
     OUT.mkdir(parents=True, exist_ok=True)
