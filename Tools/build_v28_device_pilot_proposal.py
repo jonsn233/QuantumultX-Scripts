@@ -3,6 +3,7 @@
 import csv
 import json
 from pathlib import Path
+from build_v28_broad_evidence import protected
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / "Rules/Adblock/Generated"
@@ -16,17 +17,24 @@ def build(base=BASE, limit=LIMIT):
         raise ValueError("Review-only input required")
     selected = []
     seen = set()
+    total = 0
     with (base / "QX-V2.8-Broad-Evidence-REVIEW-ONLY.csv").open(encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
+            total += 1
+            domain = row["domain"]
+            key = (row["kind"], domain)
+            if key in seen:
+                raise ValueError("Duplicate evidence row")
+            seen.add(key)
             if row["decision"] != "two_exact_review" or row["kind"] != "host":
                 continue
-            domain = row["domain"]
-            if domain in seen:
-                raise ValueError("Duplicate preview candidate")
-            seen.add(domain)
+            if protected(domain):
+                raise ValueError("Protected domain was incorrectly marked eligible: " + domain)
             if row["review_status"] != "PENDING_REVIEW" or row["device_test"] != "NOT_TESTED":
                 raise ValueError("Unexpected approval/test state")
             selected.append(domain)
+    if total != report["candidate_total"]:
+        raise ValueError("Broad inventory count mismatch")
     selected.sort()
     chosen = selected[:limit]
     # Intentionally not a .list: lines are commented, not executable rules.
