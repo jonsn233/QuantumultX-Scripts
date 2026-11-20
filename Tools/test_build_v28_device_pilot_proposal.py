@@ -14,7 +14,7 @@ class PilotProposalTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.base = Path(self.tmp.name)
         (self.base / "QX-V2.8-Broad-Evidence-Report.json").write_text(
-            json.dumps({"status": "review_only", "published": False, "approved": 0}))
+            json.dumps({"status": "review_only", "published": False, "approved": 0, "candidate_total": 4}))
         with (self.base / "QX-V2.8-Broad-Evidence-REVIEW-ONLY.csv").open("w", newline="") as f:
             w = csv.writer(f)
             w.writerow(["kind", "domain", "decision", "review_status", "device_test"])
@@ -32,12 +32,25 @@ class PilotProposalTests(unittest.TestCase):
         self.assertIn("# host,ads.example.org,reject", text)
         self.assertNotIn("zijieapi.com", text)
         self.assertTrue(all(not line.strip() or line.startswith("#") for line in text.splitlines()))
+    def test_incorrect_protected_eligibility_fails_closed(self):
+        path = self.base / "QX-V2.8-Broad-Evidence-REVIEW-ONLY.csv"
+        text = path.read_text()
+        path.write_text(text.replace("protected_hold", "two_exact_review"))
+        with self.assertRaises(ValueError):
+            build(self.base)
+
+    def test_incomplete_inventory_fails_closed(self):
+        path = self.base / "QX-V2.8-Broad-Evidence-Report.json"
+        path.write_text(json.dumps({"status": "review_only", "published": False, "approved": 0, "candidate_total": 5}))
+        with self.assertRaises(ValueError):
+            build(self.base)
+
     def test_invalid_limit_fails(self):
         with self.assertRaises(ValueError):
             build(self.base, 201)
     def test_unexpected_approval_fails(self):
         (self.base / "QX-V2.8-Broad-Evidence-Report.json").write_text(
-            json.dumps({"status": "review_only", "published": True, "approved": 0}))
+            json.dumps({"status": "review_only", "published": True, "approved": 0, "candidate_total": 4}))
         with self.assertRaises(ValueError):
             build(self.base)
 
