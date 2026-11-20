@@ -55,6 +55,14 @@ jobs:
           print(f"- V2.5 overlaps: {tier['reasons']['production_overlap']}")
           print(f"- Existing pilot overlaps: {tier['reasons']['pilot_overlap']}")
           print()
+          print("### First 20 A-tier candidates (review only)")
+          print("| Rule | Host |")
+          print("|---|---|")
+          sample = Path("Rules/Adblock/Generated/QX-CN-Tier-A-First100-REVIEW-ONLY.list")
+          for line in [s for s in sample.read_text(encoding="utf-8").splitlines() if s and not s.startswith("#")][:20]:
+              kind, domain, _ = line.split(",")
+              print(f"| {kind} | `{domain}\` |")
+          print()
           print("| Audit metric | Count |")
           print("|---|---:|")
           for key, value in d["counts"].items():
