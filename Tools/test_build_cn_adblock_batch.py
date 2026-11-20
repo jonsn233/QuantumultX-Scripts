@@ -11,6 +11,11 @@ class BulkBuilderTests(unittest.TestCase):
         self.assertEqual(rules, {("host", "ads.example")})
         self.assertEqual(stats["non_reject"], 2)
 
+    def test_upstream_advertisinglite_label(self):
+        rules, stats = parse(b"HOST,ads.example,AdvertisingLite\nHOST,proxy.example,DIRECT\n")
+        self.assertEqual(rules, {("host", "ads.example")})
+        self.assertEqual(stats["non_reject"], 1)
+
     def test_protected_services_and_parent_suffix(self):
         rules, stats = parse(b"DOMAIN-SUFFIX,apple.com,REJECT\nDOMAIN,login.alipay.com,REJECT\nDOMAIN-SUFFIX,com,REJECT\nDOMAIN,ad.example,REJECT\n")
         self.assertEqual(rules, {("host", "ad.example")})
