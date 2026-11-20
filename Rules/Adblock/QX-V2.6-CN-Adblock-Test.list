@@ -1,0 +1,10 @@
+# V2.6 CHINA ADBLOCK PILOT — OPTIONAL TEST ONLY, NOT PRODUCTION
+# Five reviewed-source candidate domains; actual app efficacy not verified.
+# Import as a separate Quantumult X filter_remote resource and keep disabled by default.
+# Enable only for short controlled A/B testing; disable to roll back.
+# This file is not part of QX-V2.5-359-Rules.list.
+host,ad.hori-gz.com,reject
+host,adfile.hori-gz.com,reject
+host,dss0.bdstatic.com,reject
+host-suffix,ads.lejuliang.com,reject
+host,ad.xunkids.com,reject
