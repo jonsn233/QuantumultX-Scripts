@@ -3,7 +3,7 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from corroborate_cn_adblock import normalize, covered
+from corroborate_cn_adblock import normalize, covered, match_type
 
 class CorroborationTests(unittest.TestCase):
     def test_oisd_domain_only(self):
@@ -24,6 +24,9 @@ class CorroborationTests(unittest.TestCase):
     def test_parent_suffix_coverage(self):
         self.assertTrue(covered("ads.example.com", {"example.com"}))
         self.assertFalse(covered("notexample.com", {"example.com"}))
+        self.assertEqual(match_type("ads.example.com", {"ads.example.com"}), "exact")
+        self.assertEqual(match_type("ads.example.com", {"example.com"}), "parent")
+        self.assertEqual(match_type("ads.example.com", {"other.example.com"}), "none")
 
 if __name__ == "__main__":
     unittest.main()
