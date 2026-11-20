@@ -10,7 +10,7 @@
   var HISTORY_LIMIT = 30;
   var A = "https://api.ipify.org?format=json";
   var B = "https://ipv4.icanhazip.com/";
-  var C = "https://api4.ipify.org/";
+  var C = "https://checkip.amazonaws.com/";
   var GEO = "https://ipwho.is/";
   var GEO_BACKUP = "https://ipapi.co/";
   var REP_OK_TTL = 6 * 60 * 60 * 1000;
