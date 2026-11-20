@@ -27,7 +27,8 @@ class TierTests(unittest.TestCase):
     def test_sensitive_first_party_and_short_domains_not_fast_tracked(self):
         domains = ["adclick.tencentmusic.com", "ad.wx.com",
                    "ad.mcloud.139.com", "ads-img-qc.xhscdn.com",
-                   "ad.gt", "ad.style"]
+                   "ad.gt", "ad.style", "ads.data.pplive.com",
+                   "adx.op.cp18.ott.cibntv.net"]
         rules = [("host", d, "reject") for d in domains]
         tiers, reasons = classify(rules, [], [])
         self.assertEqual(len(tiers["A"]), 0)
