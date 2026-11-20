@@ -63,7 +63,7 @@ jobs:
           sample = Path("Rules/Adblock/Generated/QX-CN-Tier-A-First100-REVIEW-ONLY.list")
           for line in [s for s in sample.read_text(encoding="utf-8").splitlines() if s and not s.startswith("#")][:20]:
               kind, domain, _ = line.split(",")
-              print(f"| {kind} | `{domain}\` |")
+              print(f"| {kind} | `{domain}` |")
           print()
           print("### Complete A-tier inventory (review only; NOT approved)")
           print("| # | Host |")
