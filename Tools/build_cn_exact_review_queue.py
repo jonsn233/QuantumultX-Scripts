@@ -25,6 +25,8 @@ def build(base=BASE):
     with (base / "QX-CN-All-Candidates-Corroboration-REVIEW-ONLY.csv").open(encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
             if row["kind"] == "host" and row["domain"] in a:
+                if row["domain"] in matched:
+                    raise ValueError("Duplicate A-tier evidence row")
                 matched[row["domain"]] = row
     if len(matched) != len(a):
         raise ValueError("Evidence matrix missing A-tier entries")
@@ -36,6 +38,9 @@ def build(base=BASE):
         for domain in sorted(a):
             row = matched[domain]
             count = int(row["exact_source_count"])
+            sources = [s for s in row["exact_sources"].split(";") if s]
+            if count != len(sources) or count > report["source_count"] or len(sources) != len(set(sources)):
+                raise ValueError("Inconsistent exact-source evidence")
             if count >= 2:
                 chosen.append(domain)
                 w.writerow([domain, count, row["exact_sources"], "PENDING_REVIEW", "NOT_TESTED"])
