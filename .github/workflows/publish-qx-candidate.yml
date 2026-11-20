@@ -34,13 +34,13 @@ jobs:
           mkdir -p Rules/Candidates
           cp Rules/staging/QX-V2.5-Merged-Candidate.list Rules/Candidates/QX-V2.5-Merged-Candidate.list
           cp Rules/staging/QX-V2.5-Merge-Report.json Rules/Candidates/QX-V2.5-Merge-Report.json
-          if git diff --quiet -- Rules/Candidates; then
+          git add Rules/Candidates/QX-V2.5-Merged-Candidate.list Rules/Candidates/QX-V2.5-Merge-Report.json
+          if git diff --cached --quiet -- Rules/Candidates; then
             echo "Candidate unchanged"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Rules/Candidates/QX-V2.5-Merged-Candidate.list Rules/Candidates/QX-V2.5-Merge-Report.json
           git commit -m "Publish isolated QX merged candidate for device testing"
           git push origin HEAD:main
       - name: Preserve staging diagnostics
