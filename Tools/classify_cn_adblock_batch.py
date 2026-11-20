@@ -38,7 +38,7 @@ def overlaps(a_kind, a_domain, b_kind, b_domain):
 SENSITIVE_SUFFIXES = (
     "tencentmusic.com", "wx.com", "139.com", "xhscdn.com",
 )
-SHORT_SECOND_LEVEL = re.compile(r"^[a-z0-9-]{1,3}\\.[a-z]{2,}$", re.I)
+SHORT_SECOND_LEVEL = re.compile(r"^[a-z0-9-]{1,3}\.[a-z]{2,}$", re.I)
 
 def needs_manual_escalation(domain):
     if any(domain == root or domain.endswith("." + root) for root in SENSITIVE_SUFFIXES):
