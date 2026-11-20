@@ -5,6 +5,9 @@ on:
     paths:
       - 'Tools/build_cn_adblock_batch.py'
       - 'Tools/test_build_cn_adblock_batch.py'
+      - 'Tools/classify_cn_adblock_batch.py'
+      - 'Rules/Releases/QX-V2.5-359-Rules.list'
+      - 'Rules/Adblock/QX-V2.6-CN-Adblock-Test.list'
       - '.github/workflows/build-cn-adblock-review.yml'
   workflow_dispatch:
   schedule:
@@ -24,6 +27,8 @@ jobs:
         run: python3 -m unittest discover -s Tools -p "test_build_cn_adblock_batch.py" -v
       - name: Build isolated review candidate and provenance report
         run: python3 Tools/build_cn_adblock_batch.py
+      - name: Classify all candidate rules against production and pilot
+        run: python3 Tools/classify_cn_adblock_batch.py
       - name: Publish review summary to Actions run
         if: success()
         run: |
@@ -38,6 +43,14 @@ jobs:
           print(f"- Source SHA-256: {d['source_sha256']}")
           print(f"- Active publication: **{d['active_publish']}**")
           print()
+          tier = json.loads(Path("Rules/Adblock/Generated/QX-CN-Tier-Report.json").read_text(encoding="utf-8"))
+          print()
+          print("### Risk-tier review (not approved)")
+          for name, count in tier["tiers"].items():
+              print(f"- Tier {name}: **{count}**")
+          print(f"- V2.5 overlaps: {tier['reasons']['production_overlap']}")
+          print(f"- Existing pilot overlaps: {tier['reasons']['pilot_overlap']}")
+          print()
           print("| Audit metric | Count |")
           print("|---|---:|")
           for key, value in d["counts"].items():
@@ -50,4 +63,6 @@ jobs:
           path: |
             Rules/Adblock/Generated/QX-CN-Adblock-Bulk-REVIEW-ONLY.list
             Rules/Adblock/Generated/QX-CN-Adblock-Bulk-Report.json
+            Rules/Adblock/Generated/QX-CN-Tier-*-REVIEW-ONLY.list
+            Rules/Adblock/Generated/QX-CN-Tier-Report.json
           retention-days: 14
