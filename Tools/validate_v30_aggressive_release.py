@@ -10,7 +10,7 @@ PATH = Path("Rules/Adblock/Experiments/QX-V2.8-Aggressive-Latest-OptIn.list")
 REPORT = Path("Rules/Adblock/Experiments/QX-V2.8-Aggressive-Report.json")
 # Keep service roots and their parent suffixes out of suffix-blocking rules.
 ROOTS = tuple("""apple.com icloud.com icloud.com.cn mzstatic.com itunes.apple.com openai.com chatgpt.com oaistatic.com oaiusercontent.com anthropic.com claude.ai claude.com gemini.google.com google.com googleapis.com gstatic.com googleusercontent.com alipay.com alipayobjects.com mybank.cn tenpay.com wechat.com weixin.qq.com wx.com qq.com unionpay.com 95516.com paypal.com stripe.com visa.com mastercard.com bankofchina.com icbc.com.cn ccb.com abchina.com cmbchina.com github.com githubusercontent.com githubassets.com microsoft.com live.com cloudflare.com cloudflare-dns.com dns.google dns.alidns.com dns.pub baidu.com taobao.com tmall.com jd.com douyin.com bilibili.com""".split())
-DOMAIN = re.compile(r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z][a-z0-9-]{1,62}$")
+DOMAIN = re.compile(r"^[a-z0-9][a-z0-9.-]*[a-z0-9]$")
 def protected(domain, kind):
     return any(domain == root or domain.endswith("." + root) or (kind == "host-suffix" and root.endswith("." + domain)) for root in ROOTS)
 def parse(text):
@@ -20,7 +20,7 @@ def parse(text):
         if not line or line.startswith("#"):
             continue
         fields = line.split(",")
-        if len(fields) != 3 or fields[0] not in ("host","host-suffix") or fields[2] != "reject" or not DOMAIN.fullmatch(fields[1]):
+        if len(fields) != 3 or fields[0] not in ("host","host-suffix") or fields[2] != "reject" or not DOMAIN.fullmatch(fields[1]) or ".." in fields[1] or "." not in fields[1]:
             raise ValueError("Invalid QX rule: " + line[:120])
         key = (fields[0],fields[1])
         if key in rules:
