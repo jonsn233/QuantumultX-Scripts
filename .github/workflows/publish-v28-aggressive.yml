@@ -1,14 +1,16 @@
-name: Publish pinned V2.8 aggressive opt-in list
+name: V3.0 weekly safe aggressive adblock maintenance
 on:
   push:
     branches: [main]
     paths:
       - 'Tools/publish_v28_aggressive_pinned.py'
+      - 'Tools/validate_v30_aggressive_release.py'
       - '.github/workflows/publish-v28-aggressive.yml'
   workflow_dispatch:
+  schedule:
+    - cron: '20 3 * * 1'
 permissions:
   contents: write
-  actions: read
 concurrency:
   group: v28-aggressive-publish
   cancel-in-progress: false
@@ -23,6 +25,9 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+      - name: Save previous live rules for safe comparison
+        run: |
+          git show HEAD:Rules/Adblock/Experiments/QX-V2.8-Aggressive-Latest-OptIn.list > /tmp/qx-v30-previous.list
       - name: Generate fresh candidate inventory and risk tiers
         run: |
           python3 Tools/build_cn_adblock_batch.py
@@ -33,6 +38,8 @@ jobs:
           python3 Tools/build_v28_broad_evidence.py
       - name: Generate aggressive opt-in rules and SHA256 report
         run: python3 Tools/publish_v28_aggressive_pinned.py
+      - name: Fail closed on unsafe rule changes
+        run: python3 Tools/validate_v30_aggressive_release.py
       - name: Commit only the separate aggressive opt-in resources
         run: |
           git config user.name "github-actions[bot]"
@@ -41,6 +48,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to publish"
           else
-            git commit -m "Publish pinned V2.8 aggressive 37019-rule opt-in resource"
+            git commit -m "V3.0 weekly safe refresh of aggressive adblock rules"
             git push
           fi
