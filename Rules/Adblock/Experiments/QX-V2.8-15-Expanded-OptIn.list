@@ -1,0 +1,19 @@
+# V2.8 expanded opt-in pilot: 15 exact-host ad-labelled domains.
+# Replace (do not combine with) the earlier V2.8 eight-host experiment.
+# V2.5/V2.6 unchanged. Not device-validated; disable this source if issues occur.
+# Excludes ads-pixiv.net and ads.feelingtouch.com (app-service related).
+host,ad-back.net,reject
+host,ad-balancer.net,reject
+host,ad-flow.com,reject
+host,ad-maven.com,reject
+host,ad-score.com,reject
+host,ad-server.co.za,reject
+host,ad-srv.net,reject
+host,ad.aloodo.com,reject
+host,ad4m.at,reject
+host,adclick.pk,reject
+host,ads1-adnow.com,reject
+host,ads2ads.net,reject
+host,ads3-adnow.com,reject
+host,ads5-adnow.com,reject
+host,adx1.com,reject
