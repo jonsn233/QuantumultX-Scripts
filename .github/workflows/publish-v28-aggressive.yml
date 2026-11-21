@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: read
 concurrency:
   group: v28-aggressive-publish
   cancel-in-progress: false
