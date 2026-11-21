@@ -23,19 +23,21 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      - name: Confirm pinned source and repository write permissions
+      - name: Generate fresh candidate inventory and risk tiers
         run: |
-          echo 'Publishing isolated V2.8 resource from pinned artifact 14657236587'
-          echo 'No production rules will be changed.'
-      - name: Generate exact pinned rules and verify SHA256
-        env:
-          GH_TOKEN: ${{ github.token }}
+          python3 Tools/build_cn_adblock_batch.py
+          python3 Tools/classify_cn_adblock_batch.py
+      - name: Generate independent-source corroboration and full evidence
+        run: |
+          python3 Tools/corroborate_cn_adblock.py
+          python3 Tools/build_v28_broad_evidence.py
+      - name: Generate aggressive opt-in rules and SHA256 report
         run: python3 Tools/publish_v28_aggressive_pinned.py
       - name: Commit only the separate aggressive opt-in resources
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Rules/Adblock/Experiments/QX-V2.8-Aggressive-37019-OptIn.list Rules/Adblock/Experiments/QX-V2.8-Aggressive-Report.json
+          git add Rules/Adblock/Experiments/QX-V2.8-Aggressive-Latest-OptIn.list Rules/Adblock/Experiments/QX-V2.8-Aggressive-Report.json
           if git diff --cached --quiet; then
             echo "No changes to publish"
           else
