@@ -1,0 +1,9 @@
+{
+  "source": "fresh AdvertisingLite plus independent corroboration",
+  "candidates": 37162,
+  "included": 37019,
+  "excluded": 143,
+  "sha256": "c669163f7d6d1e2be16f89a27f802a07bbb2edcd4bc0994084f3bc76edce8529",
+  "device_tested": false,
+  "warning": "Counts may change with upstream source updates"
+}
