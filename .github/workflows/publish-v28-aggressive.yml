@@ -1,0 +1,39 @@
+name: Publish pinned V2.8 aggressive opt-in list
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Tools/publish_v28_aggressive_pinned.py'
+      - '.github/workflows/publish-v28-aggressive.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: v28-aggressive-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Generate exact pinned rules and verify SHA256
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 Tools/publish_v28_aggressive_pinned.py
+      - name: Commit only the separate aggressive opt-in resources
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Rules/Adblock/Experiments/QX-V2.8-Aggressive-37019-OptIn.list Rules/Adblock/Experiments/QX-V2.8-Aggressive-Report.json
+          if git diff --cached --quiet; then
+            echo "No changes to publish"
+          else
+            git commit -m "Publish pinned V2.8 aggressive 37019-rule opt-in resource"
+            git push
+          fi
