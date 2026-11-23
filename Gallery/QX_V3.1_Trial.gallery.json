@@ -1,0 +1,15 @@
+{
+  "name": "Quantumult X V3.1 网络控制中心 · 试用版",
+  "task": [
+    {
+      "config": "event-interaction https://raw.githubusercontent.com/jonsn233/QuantumultX-Scripts/main/Scripts/Network/QX_V3.1_Control_Center.js#mode=all&force-timeout=20000, tag=V3.1 网络总控, img-url=rectangle.3.group.system, enabled=true"
+    },
+    {
+      "config": "event-interaction https://raw.githubusercontent.com/jonsn233/QuantumultX-Scripts/main/Scripts/Network/QX_V3.1_Control_Center.js#mode=health&force-timeout=20000, tag=V3.1 网络体检, img-url=waveform.path.ecg.system, enabled=true"
+    },
+    {
+      "config": "event-interaction https://raw.githubusercontent.com/jonsn233/QuantumultX-Scripts/main/Scripts/Network/QX_V3.1_Control_Center.js#mode=privacy&force-timeout=20000, tag=V3.1 规则审计, img-url=shield.lefthalf.filled.system, enabled=true"
+    }
+  ],
+  "description": "V3.1 opt-in read-only trial. Does not modify AI fixed nodes, DNS, rewrite, MitM, or active filters. Reports published rule inventory, NOT live interception."
+}
