@@ -48,6 +48,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   return {
     "api.ipify.org":{body:JSON.stringify({ip:a})},
     "ipv4.icanhazip.com":{body:b+"\n"},
+    "checkip.amazonaws.com":{body:a+"\n"},
     "my.ippure.com":{body:JSON.stringify({ip:a,fraudScore:5})},
     "api.ipapi.is":{body:JSON.stringify({ip:a,company:{abuser_score:"3% (low)"}})},
     "www.ip2location.io":{body:a+' Usage Type</label><p>ISP Fraud Score</label><p>0'},
@@ -79,13 +80,15 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
 
   // A mismatch is fail-closed: no geo request and no history write.
   x=await run({tag:"MISMATCH",answers:mocks("1.1.1.1","8.8.8.8"),prefs});
-  assert.equal(x.requests.length,2);
-  assert.match(x.output.message,/双源：未确认/);
+  assert.equal(x.requests.length,3);
+  assert.ok(x.requests.some(r=>new URL(r.url).hostname==="checkip.amazonaws.com"));
+  assert.match(x.output.message,/双源：不一致或检测失败/);
+  assert.match(x.output.message,/第三源：1\.1\.1\.1/);
   assert.equal(prefs.has("ClaudeIPGuard.v19.history.MISMATCH"),false);
 
   // Invalid IPv4 cannot enter the history.
   x=await run({tag:"INVALID",answers:mocks("999.1.1.1","999.1.1.1"),prefs});
-  assert.equal(x.requests.length,2);
+  assert.equal(x.requests.length,3);
   assert.equal(prefs.has("ClaudeIPGuard.v19.history.INVALID"),false);
 
   // Geo response for another IP is rejected, but exit history remains valid.
@@ -184,7 +187,7 @@ function mocks(a="38.113.126.217",b=a,geoIp=a) {
   failedEcho["ipv4.icanhazip.com"]={reject:"network "+("F".repeat(1500))};
   x=await run({tag:"ERROR-LENGTH",answers:failedEcho});
   assert.ok(x.output.message.length<450);
-  assert.match(x.output.message,/双源：未确认/);
+  assert.match(x.output.message,/双源：不一致或检测失败/);
 
   // Failed local persistence must not be reported as saved.
   x=await run({tag:"SAVE-FAIL",answers:mocks(),saveOk:false});
