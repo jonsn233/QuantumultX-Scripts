@@ -1,0 +1,44 @@
+# QX dedicated AI routing - remote maintenance resource
+# Snapshot of existing AI / Google / YouTube rules; no new routing rules.
+# Retain the policy in each rule; do not set force-policy.
+# Local node credentials and MITM are not part of this resource.
+
+host-suffix, chatgpt.com, AI-OpenAI
+host-suffix, openai.com, AI-OpenAI
+host-suffix, oaistatic.com, AI-OpenAI
+host-suffix, openaiapi-site.azureedge.net, AI-OpenAI
+host-suffix, chatgptusercontent.com, AI-OpenAI
+host-suffix, oaiusercontent.com, AI-OpenAI
+host-suffix, auth.openai.com, AI-OpenAI
+host-suffix, claude.ai, AI-Claude
+host-suffix, claude.com, AI-Claude
+host-suffix, anthropic.com, AI-Claude
+host-suffix, anthropicusercontent.com, AI-Claude
+host-suffix, claudeusercontent.com, AI-Claude
+host, geminiweb-pa.clients6.google.com, AI-Gemini
+host, gemini.google.com, AI-Gemini
+host, aistudio.google.com, AI-Gemini
+host, generativelanguage.googleapis.com, AI-Gemini
+host-suffix, youtube.com, Intl-YouTube
+host-suffix, youtube-nocookie.com, Intl-YouTube
+host-suffix, youtu.be, Intl-YouTube
+host-suffix, googlevideo.com, Intl-YouTube
+host-suffix, ytimg.com, Intl-YouTube
+host, yt3.ggpht.com, Intl-YouTube
+host-suffix, antigravity.google, AI-Gemini
+host-suffix, antigravity.dev, AI-Gemini
+host-suffix, idx.dev, AI-Gemini
+host-suffix, deepmind.google, AI-Gemini
+host-suffix, withgoogle.com, AI-Gemini
+host-suffix, claudemcpclient.com, AI-Claude
+host-suffix, claudemcpcontent.com, AI-Claude
+ip-asn, 15169, Intl-Google
+ip-cidr, 8.8.8.0/24, Intl-Google, no-resolve
+ip-cidr, 8.8.4.0/24, Intl-Google, no-resolve
+host-keyword, google, Intl-Google
+host-suffix, google.com, Intl-Google
+host-suffix, google.com.hk, Intl-Google
+host-suffix, googleapis.com, Intl-Google
+host-suffix, gstatic.com, Intl-Google
+host-suffix, googleusercontent.com, Intl-Google
+host-suffix, google.com.tw, Intl-Google
