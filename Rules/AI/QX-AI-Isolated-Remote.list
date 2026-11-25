@@ -42,3 +42,10 @@ host-suffix, googleapis.com, Intl-Google
 host-suffix, gstatic.com, Intl-Google
 host-suffix, googleusercontent.com, Intl-Google
 host-suffix, google.com.tw, Intl-Google
+
+# Steam - general international routing (not AI dedicated node)
+host-suffix, steamcommunity.com, Intl-General
+host-suffix, steampowered.com, Intl-General
+host-suffix, steamstatic.com, Intl-General
+host-suffix, steamusercontent.com, Intl-General
+host-suffix, steam-chat.com, Intl-General
