@@ -1,8 +1,8 @@
-/** Claude IP Guard V16.1 | QX event-interaction | Read-only policy check; fresh per-node IPv4 history. */
+/** Claude IP Guard V16.2 | QX event-interaction | Read-only policy check; fresh per-node IPv4 history. */
 (function(){
 "use strict";
 async function dashboard(env) {
- const policy="AI-Claude",version="16.1.0",start=env.now();
+ const policy="AI-Claude",version="16.2.0",start=env.now();
  const esc=v=>String(v==null?"未知":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const val=v=>v===undefined||v===null||v===""?"未知":String(v);
  function ip4(s){return typeof s==="string"&&s.split(".").length===4&&s.split(".").every(x=>/^(0|[1-9]\d{0,2})$/.test(x)&&Number(x)<=255);}
@@ -37,25 +37,46 @@ async function dashboard(env) {
  const ipv6Status=!stable?"未确认":ipv6?"双源一致":v6a&&v6b?"双源不一致":v6a||v6b?"仅单源有结果":"未取得有效 IPv6";
  const geoDetail=x=>x?x.country+" / "+x.city+" · "+val(x.asn)+" · "+x.org:"未知或响应未匹配";
  const out={version,node:before,stable,confirmed,ip,a,b,v6a,v6b,ipv6,history:h,geoConflict,geo1:g1,geo2:g2,rep:confirmed?rep:"未查询/未确认",networkAbuse:confirmed?networkAbuse:"未查询/未确认",api,web,apiMs,webMs};
- function tile(k,v,sub,color){return '<td width="50%" style="padding:3px;vertical-align:top"><div style="border:1px solid #c6d2e0;border-radius:10px;padding:8px 3px;text-align:center"><div style="font-size:11px;color:#64748b">'+esc(k)+'</div><div style="font-size:14px;font-weight:700;color:'+color+'">'+esc(v)+'</div><div style="font-size:10px;color:#718096;overflow-wrap:anywhere">'+esc(sub)+'</div></div></td>';}
- function row(k,v){return '<tr><td style="font-size:11px;color:#64748b;padding:4px 2px;width:34%">'+esc(k)+'</td><td style="font-size:11px;text-align:right;font-weight:600;padding:4px 2px;overflow-wrap:anywhere">'+esc(v)+'</td></tr>';}
- function table(rows){return '<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed">'+rows+'</table>';}
- function heading(s){return '<div style="font-size:13px;font-weight:700;color:#315b90;margin:9px 0 3px">'+esc(s)+'</div>';}
- const rec=h.records.slice(-10),marks=rec.map((x,i)=>i===0?"⚪":x.ip===rec[i-1].ip?"🟢":"🟠");
- let html='<div style="font-family:-apple-system,sans-serif;line-height:1.35;text-align:left"><div style="text-align:center;padding:10px 4px;border:1px solid #b8cadc;border-radius:12px"><div style="font-size:11px;color:#64748b;overflow-wrap:anywhere">'+esc(policy+" · "+val(before))+'</div><div style="font-size:24px;font-weight:750">'+esc(ip)+'</div><div style="font-size:12px">'+esc(place)+'</div><div style="font-size:11px;color:#64748b">'+esc(asnLabel+" · "+(g&&!geoConflict?g.org:"未知"))+'</div></div>';
- html+='<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed;margin-top:8px"><tr>'+tile("IPv4 出口",confirmed?"双源一致":"未确认",stable?"ipify + icanhazip":"策略未确认或已变化",confirmed?"#18804e":"#a66b28")+tile("IPv6 出口",ipv6Status,ipv6||"失败不等于无 IPv6",ipv6?"#18804e":"#a66b28")+'</tr><tr>'+tile("Claude API",api,"仅端点响应",r[4]&&r[4].status===401?"#18804e":"#a66b28")+tile("Claude 网页",web,"不代表登录成功",r[5]&&[200,301,302,303,307,308].includes(r[5].status)?"#18804e":"#a66b28")+'</tr></table>';
- html+=heading("最近出口采样 · "+version)+'<div style="text-align:center;font-size:17px;white-space:nowrap">'+(marks.length?marks.join(" "):"尚无有效采样")+'</div><div style="font-size:10px;color:#64748b;text-align:center">⚪ 首个样本　🟢 相同　🟠 变化 · '+rec.length+'/10</div>';
- html+=table(row("历史状态",h.status)+row("有效采样 / 变化",h.count+" / "+h.changes)+row("上次有效 IP",h.previous));
- html+=heading("来源校验")+table(row("IPv4 · ipify",a||"未知")+row("IPv4 · icanhazip",b||"未知")+row("IPv6 · ipify",v6a||"未知")+row("IPv6 · icanhazip",v6b||"未知")+row("ipwho.is",confirmed?geoDetail(g1):"未确认")+row("ipapi.co",confirmed?geoDetail(g2):"未确认"));
- html+=heading("IP 信誉 · 原始数据")+table(row("IPPure 风险分",out.rep)+row("ipapi.is 公司滥用指标",out.networkAbuse)+row("IP2Location / Scamalytics","未查询 · 未配置可靠 API"));
- html+=heading("服务响应")+table(row("API 耗时",apiMs===null?"未知":apiMs+"ms")+row("网页耗时",webMs===null?"未知":webMs+"ms")+row("总耗时",env.now()-start+"ms"));
- html+='<div style="border-top:1px solid #d1d9e3;margin-top:7px;padding-top:7px;font-size:10px;color:#718096">仅检测指定策略的请求出口；不是 Claude 服务端证明。IPv6 未确认不代表无泄漏。评分非账号风险；历史仅代表采样时刻。旧版历史不迁移。</div></div>';
- return {out,title:"🛡 Claude IP Guard · V16.1",htmlMessage:html};
+function historyStrip(history){
+ var records=(history.records||[]).slice(-10),n=records.length;
+ if(!n)return '<div style="font-size:11px;color:#718096">尚无有效历史采样</div>';
+ var marks=[],labels=[];
+ for(var i=0;i<n;i++){
+  var mark=i===0?"⚪":records[i].ip!==records[i-1].ip?"🟠":"🟢";
+  marks.push(mark);labels.push(String(i+1));
+ }
+ var html='<div style="text-align:center;font-size:17px;letter-spacing:1px;white-space:nowrap">'+marks.join(' ')+'</div>';
+ html+='<div style="text-align:center;font-size:10px;color:#64748b;letter-spacing:2px">'+labels.join('　')+'</div>';
+ html+='<div style="font-size:10px;color:#718096;margin-top:3px">左→右：较早→最近 · '+n+' 次有效采样</div>';
+ html+='<div style="font-size:10px;color:#64748b">⚪ 首个可见样本　🟢 与前次相同　🟠 与前次不同</div>';
+ html+='<div style="font-size:10px;color:#64748b">仅比较采样记录；不代表两次采样间持续稳定。</div>';
+ return html;
+}
+function show(data){
+ var e=esc,h=data.history||{},both=data.apiOK&&data.webOK;
+ function tile(label,value,sub,color){return '<td width="50%" style="padding:3px;vertical-align:top"><div style="border:1px solid #c6d2e0;border-radius:10px;padding:8px 3px;text-align:center"><div style="font-size:11px;color:#64748b">'+e(label)+'</div><div style="font-size:15px;font-weight:700;color:'+color+'">'+e(value)+'</div><div style="font-size:10px;color:#718096">'+e(sub)+'</div></div></td>';}
+ function row(k,v){return '<tr><td style="font-size:12px;color:#64748b;padding:5px 2px">'+e(k)+'</td><td style="font-size:12px;text-align:right;font-weight:600;padding:5px 2px">'+e(v)+'</td></tr>';}
+ var html='<div style="font-family:-apple-system,sans-serif;line-height:1.35;text-align:left">';
+ html+='<div style="text-align:center;padding:10px 4px;border:1px solid #b8cadc;border-radius:12px"><div style="font-size:11px;color:#64748b">AI-Claude · '+e(data.node)+'</div><div style="font-size:25px;font-weight:750;letter-spacing:.2px">'+e(data.ip)+'</div><div style="font-size:12px">'+e(data.place)+'</div><div style="font-size:11px;color:#64748b">'+e(data.asn)+' · '+e(data.org)+'</div></div>';
+ html+='<table width="100%" cellspacing="0" cellpadding="0" style="table-layout:fixed;margin-top:8px"><tr>'+
+ tile("Claude 端点",both?"可达":"待确认",data.apiStatus+" / "+data.webStatus,both?"#18804e":"#a66b28")+
+ tile("IPv4 出口",data.agree==="一致"?"双源一致":"需核对","ipify + icanhazip",data.agree==="一致"?"#18804e":"#a66b28")+'</tr><tr>'+
+ tile("出口历史",h.status||"未知",(h.count||0)+" 次采样 · "+(h.changes||0)+" 次变化",h.saved?"#315b90":"#a66b28")+
+ tile("IP 信誉",data.rep,"IPPure 风险分","#315b90")+'</tr></table>';
+ html+='<div style="font-size:13px;font-weight:700;color:#315b90;margin:10px 0 3px">最近出口采样</div>'+historyStrip(h);
+ html+='<table width="100%" cellspacing="0" cellpadding="0">'+row("上次有效 IP",h.previous||"无记录")+row("IPv6 出口",data.ipv6||data.ipv6Status)+row("归属校验",data.geoStatus)+'</table>';
+ html+='<div style="font-size:13px;font-weight:700;color:#315b90;margin:8px 0 3px">服务响应</div>';
+ html+='<table width="100%" cellspacing="0" cellpadding="0">'+row("Anthropic API",(data.apiMs===null?"未知":data.apiMs+"ms")+" · "+data.apiStatus)+row("Claude 网页",(data.webMs===null?"未知":data.webMs+"ms")+" · "+data.webStatus)+'</table>';
+ html+='<div style="border-top:1px solid #d1d9e3;margin-top:7px;padding-top:7px;font-size:10px;color:#718096">401/302 仅表示端点响应；IPv6 未确认不代表无泄漏。信誉分不等于账号风险。</div></div>';
+ return html;
+}
+ const data={node:val(before),ip,place,asn:asnLabel,org:g&&!geoConflict?g.org:"未知",agree:confirmed?"一致":"未确认",history:h,apiOK:stable&&!!r[4]&&r[4].status===401,webOK:stable&&!!r[5]&&[200,301,302,303,307,308].includes(r[5].status),apiStatus:api,webStatus:web,apiMs,webMs,rep:out.rep,ipv6,ipv6Status,geoStatus:!confirmed?"未确认":geoConflict?"来源不一致":g1&&g2&&g1.code&&g2.code&&g1.asn&&g2.asn?(g1.city!==g2.city||g1.org!==g2.org?"国家/ASN 一致，细节有差异":"双源一致"):g1&&g2?"双源部分信息":g?"单源可用":"未知"};
+ return {out,title:"🛡 Claude IP Guard · V16.2",htmlMessage:show(data)};
 }
 function qxEnv(){
  const policy="AI-Claude",timeout=6500;
  function timed(p,fallback){return new Promise(resolve=>{let done=false;const finish=v=>{if(done)return;done=true;clearTimeout(timer);resolve(v);};const timer=setTimeout(()=>finish(fallback),timeout);try{Promise.resolve(p()).then(finish,()=>finish(fallback));}catch(_){finish(fallback);}});}
  return {now:()=>Date.now(),state:()=>timed(()=>$configuration.sendMessage({action:"get_policy_state"}),null),read:k=>$prefs.valueForKey(k),write:(k,v)=> $prefs.setValueForKey(v,k),req:(url,method,headers,body)=>{const t=Date.now();return timed(()=>{const opts={url,method:method||"GET",headers:headers||{"Accept":"application/json, text/plain;q=0.9"},opts:{policy,redirection:false,"skip-cert-verify":false,"auto-cookie":false}};if(body!==undefined)opts.body=body;return Promise.resolve($task.fetch(opts)).then(r=>({status:Number(r.statusCode),body:typeof r.body==="string"?r.body:"",ms:Date.now()-t}),()=>({error:"网络请求失败"}));},{error:"超时/请求失败"});}};
 }
-dashboard(qxEnv()).then(function(r){$done({title:r.title,htmlMessage:r.htmlMessage});},function(){ $done({title:"Claude IP Guard · V16.1",message:"检测异常，未确认结果。请重新运行。"}); });
+dashboard(qxEnv()).then(function(r){$done({title:r.title,htmlMessage:r.htmlMessage});},function(){  $done({title:"Claude IP Guard · V16.2",message:"检测异常，未确认结果。请重新运行。"}); });
 })();
